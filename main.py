@@ -16,7 +16,7 @@ from collections import deque
 
 # ================= 默认配置 =================
 DEFAULT_CONFIG = {
-    'max_lines':8,'polling_rate':250,'px_color':'#fcfcfc','px_height':200,'px_width':325,'crosshair_x_ratio':0.5,'crosshair_y_ratio':0.5,'detect_center_offset_x_ratio':0.0,'detect_center_offset_y_ratio':-0.1111,'color_tolerance':20,'detection_tolerance':5,'detection_timeout':30.0,'no_fish_timeout':10.0,'confirmation_time':0.5,'reel_wait_min':4.0,'reel_wait_max':6.0,'cast_delay_min':0.1,'cast_delay_max':0.4,'dpi':1321,'sensitivity':95,'arrival_dist':1.5,'angle_tolerance':1.0,'obstacle_time':3,'polling_jitter':50,'mouse_jitter':2,'auto_throw_enabled':True,'fish_depleted_alert_enabled':True,'auto_relocate_enabled':True,'multiple_cast':True,'water_jump_threshold':124.0,'fn_lock_enabled':False,'per_check':1.0,'player_speed':5.625,'i_loop_max_iter':10,'i_loop_adaptive_max_walk':2.0,'i_loop_adaptive_ratio':0.6,'verbose_navigation':False,'log_level':'INFO','deg_per_pixel_override':None,'window_title_keyword':'布吉岛','min_distance_to_cast':5.0,'detection_poll_interval':0.2,'max_coord_retries':5,'t_loop_restart_interval':10.0,'t_loop_loose_dist':30.0,'t_loop_angle_tolerance':5.0,'walk_time_factor':0.9,'water_float_timeout':2.0,'max_water_fails':3,'pitch_down_after_arrival':0.0,'stuck_threshold':0.15,'manual_cast_timeout':31.0,'auto_cast_wait':2.0,'initial_catch_cast_delay':5.0,'copy_coord_delay':0.5,'coord_retry_delay_1':0.3,'coord_retry_delay_2':0.2,'mouse_move_step':20,'mouse_move_delay':0.005,'mouse_move_multiplier':1.0,'eye_height':1.62,'deg_per_pixel_factor':0.15,'max_rotation_attempts':5,'rotation_retry_delay':0.05,'t_to_i_distance':15.0,'water_turn_tolerance':5.0,'stuck_trigger_count':3,'i_loop_min_walk_time':0.05,'i_loop_max_walk_time':1.0,'i_loop_post_walk_delay':0.2,'align_water_max_iter':6,'align_water_delay':0.3,'cast_aim_lift':0.15,'cast_aim_lift_start':6.0,'cast_aim_lift_height':0.1,'shore_climb_time':0.3,'float_pitch_angle':45.0,'float_check_interval':0.3,'evasion_back_time':1.0,'evasion_short_max':3.0,'evasion_long_min':3.0,'evasion_long_max':5.0,'evasion_short_probability':0.8,'evasion_cycle_interval':3,'forbidden_max_depth':5,'forbidden_max_steps':50,'forbidden_step_duration':0.2,'forbidden_step_pause':0.1,'forbidden_approach_dist':5.0,'forbidden_exit_extra_time':0.3,'relocate_coord_retries':6,'exclude_spot_distance':5.0,'relocate_finish_delay':0.5,'multi_cast_delay_1':0.5,'multi_cast_delay_2':0.3,'via_spot_threshold':0.5,'click_pre_delay':0.02,'click_post_delay':0.05,'ray_align_min_step':2.0,'ui_window_width':360,'ui_window_height':900,'ui_minsize_width':360,'ui_minsize_height':700,'current_map':'map1','input_mode':'window','key_stop_navigation':'m','key_toggle_fishing':'n','grab_sample_radius':2,'grab_fail_wait':0.5,'confirm_check_interval':0.1,'prepare_cast_delay':0.1,'auto_cast_post_wait':2.0,'poll_min_interval':0.05,'post_click_interval':0.03,'combo_key_interval':0.02,'coord_abs_limit':100000,'tasklist_timeout':5,'window_activate_delay':0.05,'align_success_angle':0.5,'forbidden_poll_wait':0.3,'coord_fail_wait':0.5,'coord_fail_wait_i':0.3,'log_retention_seconds':600,'log_clean_interval_ms':300000,'hourly_check_interval':60,'pixel_err_log_interval':5.0,'manual_cast_poll_wait':1.0,'chain_near_threshold':2.0
+    'max_lines':8,'polling_rate':250,'px_color':'#fcfcfc','px_height':200,'px_width':325,'crosshair_x_ratio':0.5,'crosshair_y_ratio':0.5,'detect_center_offset_x_ratio':0.0,'detect_center_offset_y_ratio':-0.1111,'color_tolerance':20,'detection_tolerance':5,'detection_timeout':30.0,'no_fish_timeout':40.0,'base_no_fish_timeout':40.0,'confirmation_time':0.5,'reel_wait_min':4.0,'reel_wait_max':6.0,'cast_delay_min':0.1,'cast_delay_max':0.4,'dpi':1321,'sensitivity':95,'arrival_dist':1.5,'angle_tolerance':1.0,'obstacle_time':3,'polling_jitter':50,'mouse_jitter':2,'auto_throw_enabled':True,'fish_depleted_alert_enabled':True,'auto_relocate_enabled':True,'multiple_cast':True,'water_jump_threshold':124.0,'fn_lock_enabled':False,'per_check':1.0,'player_speed':5.625,'i_loop_max_iter':10,'i_loop_adaptive_max_walk':2.0,'i_loop_adaptive_ratio':0.6,'verbose_navigation':False,'log_level':'INFO','deg_per_pixel_override':None,'window_title_keyword':'布吉岛','min_distance_to_cast':5.0,'detection_poll_interval':0.2,'max_coord_retries':5,'t_loop_restart_interval':10.0,'t_loop_loose_dist':30.0,'t_loop_angle_tolerance':5.0,'walk_time_factor':0.9,'water_float_timeout':2.0,'max_water_fails':3,'pitch_down_after_arrival':0.0,'stuck_threshold':0.15,'manual_cast_timeout':31.0,'auto_cast_wait':2.0,'initial_catch_cast_delay':5.0,'copy_coord_delay':0.5,'coord_retry_delay_1':0.3,'coord_retry_delay_2':0.2,'mouse_move_step':20,'mouse_move_delay':0.005,'mouse_move_multiplier':1.0,'eye_height':1.62,'deg_per_pixel_factor':0.15,'max_rotation_attempts':5,'rotation_retry_delay':0.05,'t_to_i_distance':15.0,'water_turn_tolerance':5.0,'stuck_trigger_count':3,'i_loop_min_walk_time':0.05,'i_loop_max_walk_time':1.0,'i_loop_post_walk_delay':0.2,'align_water_max_iter':6,'align_water_delay':0.3,'cast_aim_lift':0.15,'cast_aim_lift_start':6.0,'cast_aim_lift_height':0.1,'shore_climb_time':0.3,'float_pitch_angle':45.0,'float_check_interval':0.3,'evasion_back_time':1.0,'evasion_short_max':3.0,'evasion_long_min':3.0,'evasion_long_max':5.0,'evasion_short_probability':0.8,'evasion_cycle_interval':3,'forbidden_max_depth':5,'forbidden_max_steps':50,'forbidden_step_duration':0.2,'forbidden_step_pause':0.1,'forbidden_approach_dist':5.0,'forbidden_exit_extra_time':0.3,'relocate_coord_retries':6,'exclude_spot_distance':5.0,'relocate_finish_delay':0.5,'multi_cast_delay_1':0.5,'multi_cast_delay_2':0.3,'via_spot_threshold':0.5,'click_pre_delay':0.02,'click_post_delay':0.05,'ray_align_min_step':2.0,'ui_window_width':360,'ui_window_height':900,'ui_minsize_width':360,'ui_minsize_height':700,'current_map':'map1','input_mode':'window','key_stop_navigation':'b+m','key_toggle_fishing':'b+n','grab_sample_radius':2,'grab_fail_wait':0.5,'confirm_check_interval':0.1,'prepare_cast_delay':0.1,'auto_cast_post_wait':2.0,'poll_min_interval':0.05,'post_click_interval':0.03,'combo_key_interval':0.02,'coord_abs_limit':100000,'tasklist_timeout':5,'window_activate_delay':0.05,'align_success_angle':0.5,'forbidden_poll_wait':0.3,'coord_fail_wait':0.5,'coord_fail_wait_i':0.3,'log_retention_seconds':600,'log_clean_interval_ms':300000,'hourly_check_interval':60,'pixel_err_log_interval':5.0,'manual_cast_poll_wait':1.0,'chain_near_threshold':2.0
 }
 
 # ================= 默认地图数据 =================
@@ -277,9 +277,12 @@ def load_config():
         if os.path.exists(CONFIG_PATH):
             with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
                 loaded = json.load(f)
+            had_base = 'base_no_fish_timeout' in loaded   # 旧配置迁移：无该字段时以当前 no_fish_timeout 为准
             for key in DEFAULT_CONFIG:
                 if key not in loaded:
                     loaded[key] = DEFAULT_CONFIG[key]
+            if not had_base:
+                loaded['base_no_fish_timeout'] = loaded.get('no_fish_timeout', DEFAULT_CONFIG['no_fish_timeout'])
             config.update(loaded)
         else:
             save_config_internal(config, CONFIG_PATH)
@@ -450,8 +453,10 @@ class AutoFishingApp:
         self.obstacle_count = 0
         self.last_strafe_key = None
         self.evasion_count = 0
-        self.key_stop_nav = self.config.get('key_stop_navigation', 'm')
-        self.key_toggle_fish = self.config.get('key_toggle_fishing', 'n')
+        self.key_stop_nav = self.config.get('key_stop_navigation', 'b+m')
+        self.key_toggle_fish = self.config.get('key_toggle_fishing', 'b+n')
+        self._base_no_fish_timeout = float(self.config.get('base_no_fish_timeout',
+                                                            self.config.get('no_fish_timeout', 40)))   # 配置设置里的无鱼超时原值（四图临时覆盖用，持久化保证重启后可恢复）
 
         self.last_hour = time.localtime().tm_hour
         self.hourly_reset_thread = threading.Thread(target=self._hourly_reset_loop, daemon=True)
@@ -789,8 +794,20 @@ class AutoFishingApp:
                 self.key_stop_nav = val
             elif key == 'key_toggle_fishing':
                 self.key_toggle_fish = val
+            elif key == 'no_fish_timeout':
+                self._base_no_fish_timeout = float(val)   # 更新配置设置原值（四图恢复时用）
+                self.config['base_no_fish_timeout'] = float(val)   # 持久化原值，四图 70s 覆盖后重启仍可恢复
+                self._refresh_throw_text()   # 主页面"XX秒无鱼自动抛竿"文案同步刷新
         self._save_config_async()
         self.log(f"配置 {key} → {val}", "grey")
+
+    def _refresh_throw_text(self):
+        """刷新主页面选项卡片里的无鱼抛竿文案（与 no_fish_timeout 同步）。"""
+        try:
+            timeout = int(self.config.get('no_fish_timeout', 60))
+            self.auto_throw_chk.configure(text=f"{timeout}秒无鱼自动抛竿")
+        except Exception:
+            pass
 
     def _on_input_mode_changed(self, event=None):
         """输入模式切换：global=全局注入 / window=窗口消息注入（不影响其他窗口）。"""
@@ -1075,18 +1092,73 @@ class AutoFishingApp:
         self.mouse_listener.daemon = True
         self.mouse_listener.start()
 
+    def _key_ident(self, key):
+        """返回按键统一标识：修饰键 ctrl/shift/alt，字母键小写字符；其他键返回 None。"""
+        if key == Key.ctrl_l or key == Key.ctrl_r:
+            return 'ctrl'
+        if key == Key.shift_l or key == Key.shift_r:
+            return 'shift'
+        if key == Key.alt_l or key == Key.alt_r:
+            return 'alt'
+        if hasattr(key, 'char') and key.char and key.char.isalpha():
+            return key.char.lower()
+        try:
+            if key.vk and 65 <= key.vk <= 90:
+                return chr(key.vk).lower()
+        except Exception:
+            pass
+        return None
+
+    def _match_hotkey(self, key, pressed_keys, spec):
+        """判断当前按键是否匹配快捷键配置 spec（支持组合键，如 'b+n' / 'ctrl+m'）。
+
+        组合键语义：最后一段为主键（当前按下的键），其余段为必须同时按住的
+        前缀键（B+M 表示按住 B 时按 M）。用 vk 匹配字母，规避 ctrl+字母 时
+        char 变成控制字符的坑。
+        """
+        try:
+            spec = str(spec).strip().lower()
+            parts = [p.strip() for p in spec.split('+')]
+            if not parts or not parts[0]:
+                return False
+            want_key = parts[-1]
+            want_prefixes = set(p for p in parts[:-1] if p)
+            char_ok = hasattr(key, 'char') and key.char and key.char.lower() == want_key
+            vk_ok = False
+            if len(want_key) == 1 and want_key.isalpha():
+                try:
+                    vk_ok = (key.vk == ord(want_key.upper()))
+                except Exception:
+                    pass
+            if not (char_ok or vk_ok):
+                return False
+            return want_prefixes.issubset(pressed_keys)
+        except Exception:
+            return False
+
     def start_keyboard_listener(self):
+        pressed_keys = set()
         def on_press(key):
             try:
-                if hasattr(key, 'char'):
-                    if key.char == self.key_stop_nav:
-                        self.navigation_stop_event.set()
-                        self.log(f"已按下 {self.key_stop_nav.upper()} 键，请求停止寻路", "purple")
-                    elif key.char == self.key_toggle_fish:
-                        self.root.after(0, self.toggle_B)
+                ident = self._key_ident(key)
+                if ident is None:
+                    return
+                if self._match_hotkey(key, pressed_keys, self.key_stop_nav):
+                    self.navigation_stop_event.set()
+                    self.log(f"已按下 {str(self.key_stop_nav).upper()}，请求停止寻路", "purple")
+                elif self._match_hotkey(key, pressed_keys, self.key_toggle_fish):
+                    self.root.after(0, self.toggle_B)
+                pressed_keys.add(ident)
             except Exception as e:
                 self.log(f"键盘监听异常: {e}", "orange")
-        self.keyboard_listener = KeyboardListener(on_press=on_press)
+        def on_release(key):
+            try:
+                ident = self._key_ident(key)
+                if ident is not None:
+                    pressed_keys.discard(ident)
+            except Exception:
+                pass
+        self.keyboard_listener = KeyboardListener(on_press=on_press, on_release=on_release)
         self.keyboard_listener.daemon = True
         self.keyboard_listener.start()
 
@@ -1972,7 +2044,10 @@ class AutoFishingApp:
         per_check = self.config.get('per_check',1.0)
         stuck_threshold = self.config.get('stuck_threshold',0.15); stuck_trigger = self.config.get('stuck_trigger_count',3)
         t_to_i = self.config.get('t_to_i_distance',15.0); water_tol = self.config.get('water_turn_tolerance',5.0)
-        last_ys = deque(maxlen=2); w_down=False; stuck_count=0; last_stuck_coord=None
+        last_ys = deque(maxlen=2); w_down=False
+        # 卡死状态用实例变量跨循环保留：水中反复上浮/撞墙位置不变也会累积并触发避障
+        if getattr(self, '_stuck_count', None) is None: self._stuck_count = 0
+        if getattr(self, '_last_stuck_coord', None) is None: self._last_stuck_coord = None
         try:
             while not self.navigation_stop_event.is_set():
                 coords = self._get_current_coords(2)
@@ -1984,8 +2059,21 @@ class AutoFishingApp:
                 if self._is_in_forbidden(cx,cz):
                     self.log("(T) 进入禁止区域，绕行","orange")
                     if w_down: self._key_up('w'); w_down=False
+                    self._stuck_count=0; self._last_stuck_coord=None
                     if not self._exit_forbidden_zone(cx,cz): return False
                     else: return 'retry'
+                # 卡死检测提前到落水前：无论是否在水中，位置不变都累积（修复水中撞墙不避障）
+                if self._last_stuck_coord is not None:
+                    d = math.hypot(cx-self._last_stuck_coord[0], cz-self._last_stuck_coord[1])
+                    if d < stuck_threshold:
+                        self._stuck_count+=1; self.log(f"T卡死计数: {self._stuck_count}/{stuck_trigger}","grey")
+                    else:
+                        self._stuck_count=0
+                self._last_stuck_coord = (cx,cz)
+                if self._stuck_count >= stuck_trigger:
+                    self.log("连续坐标不变，触发避障","orange")
+                    if w_down: self._key_up('w'); w_down=False
+                    self._execute_stuck_evasion(); self._stuck_count=0; self._last_stuck_coord=None; return 'retry'
                 hor_dist = math.hypot(tx-cx, tz-cz)
                 self.log(f"距钓点 {hor_dist:.1f} 格")
                 if hor_dist < t_to_i:
@@ -2002,15 +2090,6 @@ class AutoFishingApp:
                     # 上岸后停止行进，重新开始新的 I/T 循环（重新评估距离决定走 I 还是 T，避免掠过目标绕圈）
                     self.log("已上岸，重新开始导航循环","blue")
                     return 'retry'
-                if last_stuck_coord is not None:
-                    d = math.hypot(cx-last_stuck_coord[0], cz-last_stuck_coord[1])
-                    if d < stuck_threshold: stuck_count+=1; self.log(f"T卡死计数: {stuck_count}/{stuck_trigger}","grey")
-                    else: stuck_count=0
-                last_stuck_coord = (cx,cz)
-                if stuck_count >= stuck_trigger:
-                    self.log("连续坐标不变，触发避障","orange")
-                    if w_down: self._key_up('w'); w_down=False
-                    self._execute_stuck_evasion(); stuck_count=0; last_stuck_coord=None; return 'retry'
                 tyaw,tpitch = self._calc_target_angles(cx,cy,cz, tx,ty,tz)
                 if w_down: self._key_up('w'); w_down=False
                 # 远距宽松容差：距离大时允许角度偏差，减少转向校正次数
@@ -2031,7 +2110,10 @@ class AutoFishingApp:
         walk_factor = self.config.get('walk_time_factor',0.9); stuck_threshold = self.config.get('stuck_threshold',0.15)
         stuck_trigger = self.config.get('stuck_trigger_count',3); min_walk = self.config.get('i_loop_min_walk_time',0.05)
         max_walk = self.config.get('i_loop_max_walk_time',1.0); post_walk = self.config.get('i_loop_post_walk_delay',0.2)
-        iter_count=0; last_ys=deque(maxlen=2); water_fail_count=0; stuck_count=0; last_stuck_coord=None
+        iter_count=0; last_ys=deque(maxlen=2); water_fail_count=0
+        # 卡死状态用实例变量跨循环保留（水中反复上浮/撞墙位置不变也会触发避障）
+        if getattr(self, '_stuck_count', None) is None: self._stuck_count = 0
+        if getattr(self, '_last_stuck_coord', None) is None: self._last_stuck_coord = None
         while not self.navigation_stop_event.is_set() and iter_count < max_iter:
             coords = self._get_current_coords(2)
             if not coords:
@@ -2041,8 +2123,20 @@ class AutoFishingApp:
             water_th = self._get_sea_level_y(cx, cz)
             if self._is_in_forbidden(cx,cz):
                 self.log("(I) 进入禁止区域，绕行","orange")
+                self._stuck_count=0; self._last_stuck_coord=None
                 if not self._exit_forbidden_zone(cx,cz): return False
                 else: return 'retry'
+            # 卡死检测提前到落水前：水中撞墙位置不变也累积，避免反复上浮却不避障
+            if self._last_stuck_coord is not None:
+                d = math.hypot(cx-self._last_stuck_coord[0], cz-self._last_stuck_coord[1])
+                if d < stuck_threshold:
+                    self._stuck_count+=1; self.log(f"I卡死计数: {self._stuck_count}/{stuck_trigger}","grey")
+                else:
+                    self._stuck_count=0
+            self._last_stuck_coord = (cx,cz)
+            if self._stuck_count >= stuck_trigger:
+                self.log("I循环卡死，触发避障重启","orange")
+                self._execute_stuck_evasion(); self._stuck_count=0; self._last_stuck_coord=None; return 'retry'
             if cy < water_th:
                 self.log("I循环落水，转向钓点上浮...")
                 tyaw,_ = self._calc_target_angles(cx,cy,cz, tx,ty,tz)
@@ -2059,14 +2153,6 @@ class AutoFishingApp:
             hor_dist = math.hypot(tx-cx, tz-cz)
             self.log(f"距钓点 {hor_dist:.1f} 格")
             if hor_dist <= arrival_dist and cy>=water_th: break
-            if last_stuck_coord is not None:
-                d = math.hypot(cx-last_stuck_coord[0], cz-last_stuck_coord[1])
-                if d < stuck_threshold: stuck_count+=1; self.log(f"I卡死计数: {stuck_count}/{stuck_trigger}","grey")
-                else: stuck_count=0
-            last_stuck_coord = (cx,cz)
-            if stuck_count >= stuck_trigger:
-                self.log("I循环卡死，触发避障重启","orange")
-                self._execute_stuck_evasion(); stuck_count=0; last_stuck_coord=None; return 'retry'
             tyaw,tpitch = self._calc_target_angles(cx,cy,cz, tx,ty,tz)
             self._rotate_to_angle(tyaw,tpitch,cyaw,cpitch)
             walk_time = (hor_dist/speed)*walk_factor
@@ -2126,6 +2212,7 @@ class AutoFishingApp:
             self.log("该禁区已绕过，继续寻路","green")
         # —— 第二段：原有 T/I 循环 ——
         self.obstacle_count = 0
+        self._stuck_count = 0; self._last_stuck_coord = None   # 每次寻路重置卡死状态
         while not self.navigation_stop_event.is_set():
             t_result = self._t_loop(target)
             if t_result == True:
@@ -2367,6 +2454,17 @@ class AutoFishingApp:
         self.stop_fishing(); self.navigation_stop_event.set()
         with self.config_lock:
             self.config['current_map'] = map_name
+            # 四图：无鱼超时强制 70 秒；切回其他图恢复配置设置里的原值
+            if map_name == 'map4':
+                self.config['no_fish_timeout'] = 70.0
+            else:
+                self.config['no_fish_timeout'] = float(self._base_no_fish_timeout)
+            nft = self.config['no_fish_timeout']
+        if map_name == 'map4':
+            self.log(f"四图特殊规则：无鱼超时设为 {int(nft)} 秒","orange")
+        else:
+            self.log(f"已恢复无鱼超时到配置值 {int(nft)} 秒","grey")
+        self._refresh_throw_text()
         self._load_map(map_name)
         self.log("地图已切换，钓点列表已更新","green")
         with self.m_lock:
