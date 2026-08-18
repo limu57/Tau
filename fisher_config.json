@@ -13,6 +13,7 @@
     "detection_timeout": 30.0,
     "no_fish_timeout": 40.0,
     "base_no_fish_timeout": 40.0,
+    "total_catches": 0,
     "confirmation_time": 0.5,
     "reel_wait_min": 4.0,
     "reel_wait_max": 6.0,
@@ -39,7 +40,24 @@
     "verbose_navigation": false,
     "log_level": "INFO",
     "deg_per_pixel_override": null,
+    "grab_from_window": false,
     "window_title_keyword": "布吉岛",
+    "log_watch_enabled": true,
+    "log_watch_path": "",
+    "log_watch_interval": 0.3,
+    "log_relocate_enabled": true,
+    "log_watch_rules": [
+        {
+            "text": "[CHAT] 您取得了 通行证-沉船遗迹 !",
+            "action": "pass_card"
+        },
+        {
+            "text": "[CHAT] 不行! 这个钓点已经枯竭",
+            "action": "relocate"
+        }
+    ],
+    "pass_bg_enabled": true,
+    "pass_bg_color": "#8b5cf6",
     "min_distance_to_cast": 5.0,
     "detection_poll_interval": 0.2,
     "max_coord_retries": 5,
@@ -66,7 +84,7 @@
     "rotation_retry_delay": 0.05,
     "t_to_i_distance": 15.0,
     "water_turn_tolerance": 5.0,
-    "stuck_trigger_count": 3,
+    "stuck_trigger_count": 2,
     "i_loop_min_walk_time": 0.05,
     "i_loop_max_walk_time": 1.0,
     "i_loop_post_walk_delay": 0.2,

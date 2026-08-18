@@ -1,9 +1,9 @@
 """
-Tau 1.1 — Minecraft 自动钓鱼脚本 
+Tau 1.3.1 — Minecraft 自动钓鱼脚本 
 by limu57 with deepseek
 """
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import threading, queue, time, random, math, json, os, sys, re, ctypes
 import numpy as np
 import pyautogui
@@ -16,7 +16,7 @@ from collections import deque
 
 # ================= 默认配置 =================
 DEFAULT_CONFIG = {
-    'max_lines':8,'polling_rate':250,'px_color':'#fcfcfc','px_height':200,'px_width':325,'crosshair_x_ratio':0.5,'crosshair_y_ratio':0.5,'detect_center_offset_x_ratio':0.0,'detect_center_offset_y_ratio':-0.1111,'color_tolerance':20,'detection_tolerance':5,'detection_timeout':30.0,'no_fish_timeout':40.0,'base_no_fish_timeout':40.0,'confirmation_time':0.5,'reel_wait_min':4.0,'reel_wait_max':6.0,'cast_delay_min':0.1,'cast_delay_max':0.4,'dpi':1321,'sensitivity':95,'arrival_dist':1.5,'angle_tolerance':1.0,'obstacle_time':3,'polling_jitter':50,'mouse_jitter':2,'auto_throw_enabled':True,'fish_depleted_alert_enabled':True,'auto_relocate_enabled':True,'multiple_cast':True,'water_jump_threshold':124.0,'fn_lock_enabled':False,'per_check':1.0,'player_speed':5.625,'i_loop_max_iter':10,'i_loop_adaptive_max_walk':2.0,'i_loop_adaptive_ratio':0.6,'verbose_navigation':False,'log_level':'INFO','deg_per_pixel_override':None,'window_title_keyword':'布吉岛','min_distance_to_cast':5.0,'detection_poll_interval':0.2,'max_coord_retries':5,'t_loop_restart_interval':10.0,'t_loop_loose_dist':30.0,'t_loop_angle_tolerance':5.0,'walk_time_factor':0.9,'water_float_timeout':2.0,'max_water_fails':3,'pitch_down_after_arrival':0.0,'stuck_threshold':0.15,'manual_cast_timeout':31.0,'auto_cast_wait':2.0,'initial_catch_cast_delay':5.0,'copy_coord_delay':0.5,'coord_retry_delay_1':0.3,'coord_retry_delay_2':0.2,'mouse_move_step':20,'mouse_move_delay':0.005,'mouse_move_multiplier':1.0,'eye_height':1.62,'deg_per_pixel_factor':0.15,'max_rotation_attempts':5,'rotation_retry_delay':0.05,'t_to_i_distance':15.0,'water_turn_tolerance':5.0,'stuck_trigger_count':3,'i_loop_min_walk_time':0.05,'i_loop_max_walk_time':1.0,'i_loop_post_walk_delay':0.2,'align_water_max_iter':6,'align_water_delay':0.3,'cast_aim_lift':0.15,'cast_aim_lift_start':6.0,'cast_aim_lift_height':0.1,'shore_climb_time':0.3,'float_pitch_angle':45.0,'float_check_interval':0.3,'evasion_back_time':1.0,'evasion_short_max':3.0,'evasion_long_min':3.0,'evasion_long_max':5.0,'evasion_short_probability':0.8,'evasion_cycle_interval':3,'forbidden_max_depth':5,'forbidden_max_steps':50,'forbidden_step_duration':0.2,'forbidden_step_pause':0.1,'forbidden_approach_dist':5.0,'forbidden_exit_extra_time':0.3,'relocate_coord_retries':6,'exclude_spot_distance':5.0,'relocate_finish_delay':0.5,'multi_cast_delay_1':0.5,'multi_cast_delay_2':0.3,'via_spot_threshold':0.5,'click_pre_delay':0.02,'click_post_delay':0.05,'ray_align_min_step':2.0,'ui_window_width':360,'ui_window_height':900,'ui_minsize_width':360,'ui_minsize_height':700,'current_map':'map1','input_mode':'window','key_stop_navigation':'b+m','key_toggle_fishing':'b+n','grab_sample_radius':2,'grab_fail_wait':0.5,'confirm_check_interval':0.1,'prepare_cast_delay':0.1,'auto_cast_post_wait':2.0,'poll_min_interval':0.05,'post_click_interval':0.03,'combo_key_interval':0.02,'coord_abs_limit':100000,'tasklist_timeout':5,'window_activate_delay':0.05,'align_success_angle':0.5,'forbidden_poll_wait':0.3,'coord_fail_wait':0.5,'coord_fail_wait_i':0.3,'log_retention_seconds':600,'log_clean_interval_ms':300000,'hourly_check_interval':60,'pixel_err_log_interval':5.0,'manual_cast_poll_wait':1.0,'chain_near_threshold':2.0
+    'max_lines':8,'polling_rate':250,'px_color':'#fcfcfc','px_height':200,'px_width':325,'crosshair_x_ratio':0.5,'crosshair_y_ratio':0.5,'detect_center_offset_x_ratio':0.0,'detect_center_offset_y_ratio':-0.1111,'color_tolerance':20,'detection_tolerance':5,'detection_timeout':30.0,'no_fish_timeout':40.0,'base_no_fish_timeout':40.0,'total_catches':0,'confirmation_time':0.5,'reel_wait_min':4.0,'reel_wait_max':6.0,'cast_delay_min':0.1,'cast_delay_max':0.4,'dpi':1321,'sensitivity':95,'arrival_dist':1.5,'angle_tolerance':1.0,'obstacle_time':3,'polling_jitter':50,'mouse_jitter':2,'auto_throw_enabled':True,'fish_depleted_alert_enabled':True,'auto_relocate_enabled':True,'multiple_cast':True,'water_jump_threshold':124.0,'fn_lock_enabled':False,'per_check':1.0,'player_speed':5.625,'i_loop_max_iter':10,'i_loop_adaptive_max_walk':2.0,'i_loop_adaptive_ratio':0.6,'verbose_navigation':False,'log_level':'INFO','deg_per_pixel_override':None,'grab_from_window':False,'window_title_keyword':'布吉岛','log_watch_enabled':True,'log_watch_path':'','log_watch_interval':0.3,'log_relocate_enabled':True,'log_watch_rules':[{'text':'[CHAT] 您取得了 通行证-沉船遗迹 !','action':'pass_card'},{'text':'[CHAT] 不行! 这个钓点已经枯竭','action':'relocate'}],'pass_bg_enabled':True,'pass_bg_color':'#8b5cf6','min_distance_to_cast':5.0,'detection_poll_interval':0.2,'max_coord_retries':5,'t_loop_restart_interval':10.0,'t_loop_loose_dist':30.0,'t_loop_angle_tolerance':5.0,'walk_time_factor':0.9,'water_float_timeout':2.0,'max_water_fails':3,'pitch_down_after_arrival':0.0,'stuck_threshold':0.15,'manual_cast_timeout':31.0,'auto_cast_wait':2.0,'initial_catch_cast_delay':5.0,'copy_coord_delay':0.5,'coord_retry_delay_1':0.3,'coord_retry_delay_2':0.2,'mouse_move_step':20,'mouse_move_delay':0.005,'mouse_move_multiplier':1.0,'eye_height':1.62,'deg_per_pixel_factor':0.15,'max_rotation_attempts':5,'rotation_retry_delay':0.05,'t_to_i_distance':15.0,'water_turn_tolerance':5.0,'stuck_trigger_count':2,'i_loop_min_walk_time':0.05,'i_loop_max_walk_time':1.0,'i_loop_post_walk_delay':0.2,'align_water_max_iter':6,'align_water_delay':0.3,'cast_aim_lift':0.15,'cast_aim_lift_start':6.0,'cast_aim_lift_height':0.1,'shore_climb_time':0.3,'float_pitch_angle':45.0,'float_check_interval':0.3,'evasion_back_time':1.0,'evasion_short_max':3.0,'evasion_long_min':3.0,'evasion_long_max':5.0,'evasion_short_probability':0.8,'evasion_cycle_interval':3,'forbidden_max_depth':5,'forbidden_max_steps':50,'forbidden_step_duration':0.2,'forbidden_step_pause':0.1,'forbidden_approach_dist':5.0,'forbidden_exit_extra_time':0.3,'relocate_coord_retries':6,'exclude_spot_distance':5.0,'relocate_finish_delay':0.5,'multi_cast_delay_1':0.5,'multi_cast_delay_2':0.3,'via_spot_threshold':0.5,'click_pre_delay':0.02,'click_post_delay':0.05,'ray_align_min_step':2.0,'ui_window_width':360,'ui_window_height':900,'ui_minsize_width':360,'ui_minsize_height':700,'current_map':'map1','input_mode':'window','key_stop_navigation':'b+m','key_toggle_fishing':'b+n','grab_sample_radius':2,'grab_fail_wait':0.5,'confirm_check_interval':0.1,'prepare_cast_delay':0.1,'auto_cast_post_wait':2.0,'poll_min_interval':0.05,'post_click_interval':0.03,'combo_key_interval':0.02,'coord_abs_limit':100000,'tasklist_timeout':5,'window_activate_delay':0.05,'align_success_angle':0.5,'forbidden_poll_wait':0.3,'coord_fail_wait':0.5,'coord_fail_wait_i':0.3,'log_retention_seconds':600,'log_clean_interval_ms':300000,'hourly_check_interval':60,'pixel_err_log_interval':5.0,'manual_cast_poll_wait':1.0,'chain_near_threshold':2.0
 }
 
 # ================= 默认地图数据 =================
@@ -25,7 +25,8 @@ DEFAULT_MAP_DATA = {'maps': {'map1': {'name': '一图(绿林浅滩)',
                    'sea_levels': [{'id': 'L0', 'y': 124.0, 'rects': []},
                                   {'id': 'L1',
                                    'y': 129.0,
-                                   'rects': [[-263.3, -121.7, -39.7, -24.3], [-264.76, -26.55, -96.48, 184.7]]}],
+                                   'rects': [[-263.3, -121.7, -39.7, -24.3],
+                                             [-264.76, -26.55, -96.48, 184.7]]}],
                    'forbidden_zones': [],
                    'via_stations': [],
                    'special_spots': [[-13.94, 125.0, 161.77],
@@ -42,57 +43,58 @@ DEFAULT_MAP_DATA = {'maps': {'map1': {'name': '一图(绿林浅滩)',
                                           {'id': 'A4', 'x': 48.97, 'y': 124.0, 'z': 197.88},
                                           {'id': 'A5', 'x': 54.03, 'y': 124.0, 'z': 213.39},
                                           {'id': 'A6', 'x': 44.38, 'y': 124.0, 'z': 238.18},
-                                          {'id': 'A7', 'x': 27.99, 'y': 125.0, 'z': 247.48}]},
-                   'fishing_spots': [{'x': -59.81, 'y': 124.0, 'z': 10.27, 'yaw': -833.32, 'pitch': 13.34},
-                                     {'x': -60.99, 'y': 124.0, 'z': 26.0, 'yaw': -831.24, 'pitch': 12.92},
-                                     {'x': -61.21, 'y': 124.0, 'z': 44.77, 'yaw': -835.54, 'pitch': 12.09},
-                                     {'x': -60.47, 'y': 124.0, 'z': 64.12, 'yaw': -793.04, 'pitch': 11.39},
-                                     {'x': -59.13, 'y': 124.0, 'z': 98.61, 'yaw': -810.82, 'pitch': 12.51},
-                                     {'x': -43.56, 'y': 124.0, 'z': 128.2, 'yaw': -858.46, 'pitch': 12.37},
-                                     {'x': -23.24, 'y': 124.0, 'z': 152.08, 'yaw': -854.15, 'pitch': 14.31},
-                                     {'x': -221.3, 'y': 129.0, 'z': 42.1, 'yaw': -683.33, 'pitch': 8.62},
-                                     {'x': -207.46, 'y': 129.0, 'z': 48.01, 'yaw': -699.71, 'pitch': 15.56},
-                                     {'x': -186.81, 'y': 129.0, 'z': 48.72, 'yaw': -703.18, 'pitch': 14.87},
-                                     {'x': -171.16, 'y': 131.0, 'z': 53.74, 'yaw': -700.69, 'pitch': 27.64},
-                                     {'x': -137.99, 'y': 129.0, 'z': 65.32, 'yaw': -688.46, 'pitch': 20.01},
-                                     {'x': -121.05, 'y': 129.0, 'z': 67.67, 'yaw': -709.02, 'pitch': 10.98},
-                                     {'x': -192.25, 'y': 131.0, 'z': 76.74, 'yaw': -974.83, 'pitch': 23.34},
-                                     {'x': -218.22, 'y': 133.0, 'z': 95.94, 'yaw': -921.08, 'pitch': 32.23},
-                                     {'x': -253.07, 'y': 133.0, 'z': 78.77, 'yaw': -830.67, 'pitch': 32.37},
-                                     {'x': -251.09, 'y': 130.0, 'z': 46.04, 'yaw': -769.71, 'pitch': 17.78},
-                                     {'x': -258.01, 'y': 131.0, 'z': 32.97, 'yaw': -834.98, 'pitch': 23.62},
-                                     {'x': -230.07, 'y': 130.0, 'z': -54.16, 'yaw': -770.95, 'pitch': 25.14},
-                                     {'x': -230.98, 'y': 130.0, 'z': -27.0, 'yaw': -867.61, 'pitch': 22.78},
-                                     {'x': -227.77, 'y': 130.0, 'z': -17.18, 'yaw': -847.75, 'pitch': 25.98},
-                                     {'x': -223.93, 'y': 131.0, 'z': -1.2, 'yaw': -840.95, 'pitch': 30.28},
-                                     {'x': -201.97, 'y': 131.0, 'z': 13.3, 'yaw': -1000.24, 'pitch': 28.89},
-                                     {'x': -194.0, 'y': 131.0, 'z': 29.03, 'yaw': -1028.71, 'pitch': 27.5},
-                                     {'x': -221.93, 'y': 131.0, 'z': -71.17, 'yaw': -1165.36, 'pitch': 23.62},
-                                     {'x': -210.67, 'y': 129.0, 'z': -87.07, 'yaw': -1155.64, 'pitch': 14.45},
-                                     {'x': -190.73, 'y': 129.0, 'z': -104.83, 'yaw': -1074.12, 'pitch': 12.51},
-                                     {'x': -171.8, 'y': 130.0, 'z': -103.02, 'yaw': -1060.09, 'pitch': 18.62},
-                                     {'x': -157.97, 'y': 129.0, 'z': -90.92, 'yaw': -1041.07, 'pitch': 16.12},
-                                     {'x': -146.74, 'y': 129.0, 'z': -83.73, 'yaw': -1052.04, 'pitch': 15.42},
-                                     {'x': -151.94, 'y': 130.0, 'z': -62.3, 'yaw': -858.72, 'pitch': 22.23},
-                                     {'x': -165.5, 'y': 129.0, 'z': -64.99, 'yaw': -899.97, 'pitch': 17.51},
-                                     {'x': -191.14, 'y': 129.0, 'z': -63.87, 'yaw': -911.63, 'pitch': 13.76},
-                                     {'x': -204.27, 'y': 131.0, 'z': -54.7, 'yaw': -908.58, 'pitch': 24.45},
-                                     {'x': -7.05, 'y': 124.0, 'z': -96.3, 'yaw': -1142.58, 'pitch': 14.87},
-                                     {'x': -10.21, 'y': 124.0, 'z': -74.1, 'yaw': -1148.83, 'pitch': 12.78},
-                                     {'x': -29.76, 'y': 126.0, 'z': -55.32, 'yaw': -1110.64, 'pitch': 25.42},
-                                     {'x': -54.26, 'y': 128.0, 'z': -55.95, 'yaw': -1075.92, 'pitch': 30.7},
-                                     {'x': -65.79, 'y': 129.0, 'z': -62.14, 'yaw': -1049.11, 'pitch': 17.78},
-                                     {'x': -82.34, 'y': 130.0, 'z': -57.3, 'yaw': -1261.32, 'pitch': 32.23},
-                                     {'x': -104.63, 'y': 130.0, 'z': -56.26, 'yaw': -1241.04, 'pitch': 23.2},
-                                     {'x': -115.93, 'y': 132.0, 'z': -56.5, 'yaw': -1271.18, 'pitch': 29.45},
-                                     {'x': -128.05, 'y': 130.0, 'z': -77.01, 'yaw': -1068.56, 'pitch': 19.59},
-                                     {'x': -13.94, 'y': 125.0, 'z': 161.77, 'yaw': -1910.47, 'pitch': 16.12},
-                                     {'x': 13.58, 'y': 124.0, 'z': 182.14, 'yaw': -1588.96, 'pitch': 11.95},
-                                     {'x': 31.97, 'y': 124.0, 'z': 188.03, 'yaw': -1608.26, 'pitch': 12.78},
-                                     {'x': 48.97, 'y': 124.0, 'z': 197.88, 'yaw': -1579.37, 'pitch': 12.78},
-                                     {'x': 54.03, 'y': 124.0, 'z': 213.39, 'yaw': -1537.43, 'pitch': 14.59},
-                                     {'x': 44.38, 'y': 124.0, 'z': 238.18, 'yaw': -1490.9, 'pitch': 19.17},
-                                     {'x': 27.99, 'y': 125.0, 'z': 247.48, 'yaw': -1436.88, 'pitch': 15.98}],
+                                          {'id': 'A7', 'x': 27.99, 'y': 125.0, 'z': 247.48}],
+                                'class': 'chain'},
+                   'fishing_spots': [{'x': -59.81, 'y': 124.0, 'z': 10.27},
+                                     {'x': -60.99, 'y': 124.0, 'z': 26.0},
+                                     {'x': -61.21, 'y': 124.0, 'z': 44.77},
+                                     {'x': -60.47, 'y': 124.0, 'z': 64.12},
+                                     {'x': -59.13, 'y': 124.0, 'z': 98.61},
+                                     {'x': -43.56, 'y': 124.0, 'z': 128.2},
+                                     {'x': -23.24, 'y': 124.0, 'z': 152.08},
+                                     {'x': -221.3, 'y': 129.0, 'z': 42.1},
+                                     {'x': -207.46, 'y': 129.0, 'z': 48.01},
+                                     {'x': -186.81, 'y': 129.0, 'z': 48.72},
+                                     {'x': -171.16, 'y': 131.0, 'z': 53.74},
+                                     {'x': -137.99, 'y': 129.0, 'z': 65.32},
+                                     {'x': -121.05, 'y': 129.0, 'z': 67.67},
+                                     {'x': -192.25, 'y': 131.0, 'z': 76.74},
+                                     {'x': -218.22, 'y': 133.0, 'z': 95.94},
+                                     {'x': -253.07, 'y': 133.0, 'z': 78.77},
+                                     {'x': -251.09, 'y': 130.0, 'z': 46.04},
+                                     {'x': -258.01, 'y': 131.0, 'z': 32.97},
+                                     {'x': -230.07, 'y': 130.0, 'z': -54.16},
+                                     {'x': -230.98, 'y': 130.0, 'z': -27.0},
+                                     {'x': -227.77, 'y': 130.0, 'z': -17.18},
+                                     {'x': -223.93, 'y': 131.0, 'z': -1.2},
+                                     {'x': -201.97, 'y': 131.0, 'z': 13.3},
+                                     {'x': -194.0, 'y': 131.0, 'z': 29.03},
+                                     {'x': -221.93, 'y': 131.0, 'z': -71.17},
+                                     {'x': -210.67, 'y': 129.0, 'z': -87.07},
+                                     {'x': -190.73, 'y': 129.0, 'z': -104.83},
+                                     {'x': -171.8, 'y': 130.0, 'z': -103.02},
+                                     {'x': -157.97, 'y': 129.0, 'z': -90.92},
+                                     {'x': -146.74, 'y': 129.0, 'z': -83.73},
+                                     {'x': -151.94, 'y': 130.0, 'z': -62.3},
+                                     {'x': -165.5, 'y': 129.0, 'z': -64.99},
+                                     {'x': -191.14, 'y': 129.0, 'z': -63.87},
+                                     {'x': -204.27, 'y': 131.0, 'z': -54.7},
+                                     {'x': -7.05, 'y': 124.0, 'z': -96.3},
+                                     {'x': -10.21, 'y': 124.0, 'z': -74.1},
+                                     {'x': -29.76, 'y': 126.0, 'z': -55.32},
+                                     {'x': -54.26, 'y': 128.0, 'z': -55.95},
+                                     {'x': -65.79, 'y': 129.0, 'z': -62.14},
+                                     {'x': -82.34, 'y': 130.0, 'z': -57.3},
+                                     {'x': -104.63, 'y': 130.0, 'z': -56.26},
+                                     {'x': -115.93, 'y': 132.0, 'z': -56.5},
+                                     {'x': -128.05, 'y': 130.0, 'z': -77.01},
+                                     {'x': -13.94, 'y': 125.0, 'z': 161.77},
+                                     {'x': 13.58, 'y': 124.0, 'z': 182.14},
+                                     {'x': 31.97, 'y': 124.0, 'z': 188.03},
+                                     {'x': 48.97, 'y': 124.0, 'z': 197.88},
+                                     {'x': 54.03, 'y': 124.0, 'z': 213.39},
+                                     {'x': 44.38, 'y': 124.0, 'z': 238.18},
+                                     {'x': 27.99, 'y': 125.0, 'z': 247.48}],
                    'water_candidates': [{'water_x': -54.46, 'water_y': 124.0, 'water_z': 23.99},
                                         {'water_x': -53.55, 'water_y': 124.0, 'water_z': 7.76},
                                         {'water_x': -54.71, 'water_y': 124.0, 'water_z': 41.63},
@@ -147,58 +149,28 @@ DEFAULT_MAP_DATA = {'maps': {'map1': {'name': '一图(绿林浅滩)',
                    'water_jump_threshold': 120.0,
                    'sea_levels': [{'id': 'L0', 'y': 120.0, 'rects': []}],
                    'forbidden_zones': [],
-                   'via_stations': [{'id': 'A1',
-                                     'x': 282.0,
-                                     'y': 122.0,
-                                     'z': 283.0,
-                                     'yaw': 0.0,
-                                     'pitch': 0.0,
-                                     'water_x': 282.0,
-                                     'water_y': 122.0,
-                                     'water_z': 283.0},
-                                    {'id': 'A2',
-                                     'x': 260.0,
-                                     'y': 122.0,
-                                     'z': 261.0,
-                                     'yaw': 0.0,
-                                     'pitch': 0.0,
-                                     'water_x': 260.0,
-                                     'water_y': 122.0,
-                                     'water_z': 261.0}],
-                   'special_spots': [[275.38, 122.0, 289.07],
-                                     [281.37, 122.0, 301.03],
-                                     [247.76, 122.0, 274.14],
-                                     [258.4, 122.0, 282.92]],
-                   'via_rule': {'mode': 'decision',
-                                'decision_spots': [{'id': 'am3', 'station': 'A1', 'x': 275.38, 'y': 122.0, 'z': 289.07},
-                                                   {'id': 'am4',
-                                                    'station': 'A2',
-                                                    'x': 281.37,
-                                                    'y': 122.0,
-                                                    'z': 301.03}],
-                                'fallback_path': []},
-                   'fishing_spots': [{'x': 181.32, 'y': 122.0, 'z': 166.24, 'yaw': 109.17, 'pitch': 24.02},
-                                     {'x': 206.92, 'y': 120.0, 'z': 122.97, 'yaw': 118.89, 'pitch': 19.85},
-                                     {'x': 213.92, 'y': 122.0, 'z': 173.91, 'yaw': 23.9, 'pitch': 31.24},
-                                     {'x': 228.95, 'y': 120.0, 'z': 252.5, 'yaw': -325.1, 'pitch': 15.83},
-                                     {'x': 234.08, 'y': 120.0, 'z': 188.89, 'yaw': -60.12, 'pitch': 12.77},
-                                     {'x': 235.22, 'y': 120.0, 'z': 217.69, 'yaw': -237.89, 'pitch': 12.08},
-                                     {'x': 247.5, 'y': 120.0, 'z': 167.08, 'yaw': 317.9, 'pitch': 15.96},
-                                     {'x': 247.76, 'y': 122.0, 'z': 274.14, 'yaw': -310.8, 'pitch': 24.17},
-                                     {'x': 247.79, 'y': 120.0, 'z': 141.19, 'yaw': 238.6, 'pitch': 9.71},
-                                     {'x': 258.4, 'y': 122.0, 'z': 282.92, 'yaw': -258.45, 'pitch': 27.64},
-                                     {'x': 269.9, 'y': 120.0, 'z': 198.11, 'yaw': 495.81, 'pitch': 10.69},
-                                     {'x': 275.38, 'y': 122.0, 'z': 289.07, 'yaw': -255.81, 'pitch': 29.17},
-                                     {'x': 281.37, 'y': 122.0, 'z': 301.03, 'yaw': -352.46, 'pitch': 31.95},
-                                     {'x': 291.27, 'y': 120.0, 'z': 185.9, 'yaw': 477.06, 'pitch': 10.41},
-                                     {'x': 298.85, 'y': 120.0, 'z': 177.21, 'yaw': 514.42, 'pitch': 11.38},
-                                     {'x': 317.39, 'y': 120.0, 'z': 325.74, 'yaw': -337.33, 'pitch': 13.05},
-                                     {'x': 331.84, 'y': 120.0, 'z': 145.96, 'yaw': 512.75, 'pitch': 11.94},
-                                     {'x': 333.94, 'y': 120.0, 'z': 328.94, 'yaw': -375.52, 'pitch': 16.52},
-                                     {'x': 358.3, 'y': 120.0, 'z': 153.13, 'yaw': 249.99, 'pitch': 10.69},
-                                     {'x': 364.15, 'y': 120.0, 'z': 172.41, 'yaw': 289.43, 'pitch': 12.35},
-                                     {'x': 365.84, 'y': 120.5, 'z': 190.28, 'yaw': -15.13, 'pitch': 19.16},
-                                     {'x': 376.0, 'y': 120.0, 'z': 234.82, 'yaw': -75.96, 'pitch': 13.19}],
+                   'fishing_spots': [{'x': 181.32, 'y': 122.0, 'z': 166.24},
+                                     {'x': 206.92, 'y': 120.0, 'z': 122.97},
+                                     {'x': 213.92, 'y': 122.0, 'z': 173.91},
+                                     {'x': 228.95, 'y': 120.0, 'z': 252.5},
+                                     {'x': 234.08, 'y': 120.0, 'z': 188.89},
+                                     {'x': 235.22, 'y': 120.0, 'z': 217.69},
+                                     {'x': 247.5, 'y': 120.0, 'z': 167.08},
+                                     {'x': 247.76, 'y': 122.0, 'z': 274.14},
+                                     {'x': 247.79, 'y': 120.0, 'z': 141.19},
+                                     {'x': 258.4, 'y': 122.0, 'z': 282.92},
+                                     {'x': 269.9, 'y': 120.0, 'z': 198.11},
+                                     {'x': 275.38, 'y': 122.0, 'z': 289.07},
+                                     {'x': 281.37, 'y': 122.0, 'z': 301.03},
+                                     {'x': 291.27, 'y': 120.0, 'z': 185.9},
+                                     {'x': 298.85, 'y': 120.0, 'z': 177.21},
+                                     {'x': 317.39, 'y': 120.0, 'z': 325.74},
+                                     {'x': 331.84, 'y': 120.0, 'z': 145.96},
+                                     {'x': 333.94, 'y': 120.0, 'z': 328.94},
+                                     {'x': 358.3, 'y': 120.0, 'z': 153.13},
+                                     {'x': 364.15, 'y': 120.0, 'z': 172.41},
+                                     {'x': 365.84, 'y': 120.5, 'z': 190.28},
+                                     {'x': 376.0, 'y': 120.0, 'z': 234.82}],
                    'water_candidates': [{'water_x': 173.44, 'water_y': 120.0, 'water_z': 163.51},
                                         {'water_x': 202.75, 'water_y': 120.0, 'water_z': 120.31},
                                         {'water_x': 211.56, 'water_y': 120.0, 'water_z': 179.7},
@@ -220,7 +192,25 @@ DEFAULT_MAP_DATA = {'maps': {'map1': {'name': '一图(绿林浅滩)',
                                         {'water_x': 365.46, 'water_y': 120.0, 'water_z': 150.76},
                                         {'water_x': 367.6, 'water_y': 120.0, 'water_z': 196.4},
                                         {'water_x': 370.3, 'water_y': 120.0, 'water_z': 174.39},
-                                        {'water_x': 382.71, 'water_y': 120.0, 'water_z': 236.7}]},
+                                        {'water_x': 382.71, 'water_y': 120.0, 'water_z': 236.7}],
+                   'sub_via_stations': [{'id': 'A1',
+                                         'x': 282.0,
+                                         'y': 122.0,
+                                         'z': 283.0,
+                                         'spots': [12, 13],
+                                         'class': 'sub'},
+                                        {'id': 'A2',
+                                         'x': 260.0,
+                                         'y': 122.0,
+                                         'z': 261.0,
+                                         'spots': [8, 10],
+                                         'class': 'sub'},
+                                        {'id': 'A3',
+                                         'x': 224.23,
+                                         'y': 123.0,
+                                         'z': 163.88,
+                                         'spots': [1, 2, 3],
+                                         'class': 'sub'}]},
           'map3': {'name': '三图(绿林深潭)',
                    'sea_levels': [],
                    'forbidden_zones': [],
@@ -361,6 +351,21 @@ SPECIAL_SPOTS = [tuple(s) for s in (MAP_DATA.get('special_spots') or [])]
 VIA_RULE = MAP_DATA.get('via_rule')
 HAS_FORBIDDEN_ZONE = bool(FORBIDDEN_ZONES)
 
+class _BITMAPINFOHEADER(ctypes.Structure):
+    _fields_ = [
+        ("biSize", ctypes.c_uint32),
+        ("biWidth", ctypes.c_int32),
+        ("biHeight", ctypes.c_int32),
+        ("biPlanes", ctypes.c_uint16),
+        ("biBitCount", ctypes.c_uint16),
+        ("biCompression", ctypes.c_uint32),
+        ("biSizeImage", ctypes.c_uint32),
+        ("biXPelsPerMeter", ctypes.c_int32),
+        ("biYPelsPerMeter", ctypes.c_int32),
+        ("biClrUsed", ctypes.c_uint32),
+        ("biClrImportant", ctypes.c_uint32),
+    ]
+
 # ================= 圆角按钮 =================
 ICON_BASE64 = "data:image/x-icon;base64,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"
 
@@ -457,13 +462,14 @@ class AutoFishingApp:
         self.key_toggle_fish = self.config.get('key_toggle_fishing', 'b+n')
         self._base_no_fish_timeout = float(self.config.get('base_no_fish_timeout',
                                                             self.config.get('no_fish_timeout', 40)))   # 配置设置里的无鱼超时原值（四图临时覆盖用，持久化保证重启后可恢复）
+        self.total_catches = int(self.config.get('total_catches', 0))   # 累计上钩数（持久化，重启不消失）
 
         self.last_hour = time.localtime().tm_hour
         self.hourly_reset_thread = threading.Thread(target=self._hourly_reset_loop, daemon=True)
         self.hourly_reset_thread.start()
 
         self.root = tk.Tk()
-        self.root.title("Tau 1.1")
+        self.root.title("Tau 1.3.1")
         w = config.get('ui_window_width', 300); h = config.get('ui_window_height', 900)
         mw = config.get('ui_minsize_width', 300); mh = config.get('ui_minsize_height', 700)
         self.root.geometry(f"{w}x{h}"); self.root.minsize(mw, mh)
@@ -473,7 +479,9 @@ class AutoFishingApp:
         self.fish_depleted_alert_enabled = tk.BooleanVar(value=config.get('fish_depleted_alert_enabled', True))
         self.auto_relocate_enabled = tk.BooleanVar(value=config.get('auto_relocate_enabled', False))
         self.multiple_cast_enabled = tk.BooleanVar(value=config.get('multiple_cast', False))
+        self.pass_bg_enabled_var = tk.BooleanVar(value=config.get('pass_bg_enabled', True))
         self.depleted_alerted = False
+        self.relocating = False   # 日志触发换池进行中标志（防止重复触发）
 
         fn_lock_enabled = config.get('fn_lock_enabled', True)
         self.fn_lock_on_var = tk.BooleanVar(value=fn_lock_enabled)
@@ -521,15 +529,20 @@ class AutoFishingApp:
         self.setup_ui()
         self.start_mouse_listener()
         self.start_keyboard_listener()
+        self.start_log_watcher()
+        self._log_queue = queue.Queue()   # 跨线程日志队列（主线程轮询刷新，避免后台线程直调 Tk）
+        self._ui_queue = queue.Queue()    # 跨线程 UI 回调队列（主线程执行，如刷新累计上钩数）
+        self.root.after(100, self._drain_log_queue)
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.auto_throw_enabled.trace_add('write', lambda *a: self._on_checkbox_changed())
         self.fish_depleted_alert_enabled.trace_add('write', lambda *a: self._on_checkbox_changed())
         self.auto_relocate_enabled.trace_add('write', lambda *a: self._on_checkbox_changed())
         self.multiple_cast_enabled.trace_add('write', lambda *a: self._on_checkbox_changed())
+        self.pass_bg_enabled_var.trace_add('write', lambda *a: self._on_pass_bg_changed())
         self.fn_lock_on_var.trace_add('write', lambda *a: self._on_fn_lock_changed())
         self.fn_lock_off_var.trace_add('write', lambda *a: self._on_fn_lock_changed())
         self._update_status("就绪")
-        self.log("欢迎使用Tau 1.1，作者:limu57，禁止倒卖，项目地址:https://github.com/limu57/Tau", "blue")
+        self.log("欢迎使用Tau 1.3.1，作者:limu57，禁止倒卖，项目地址:https://github.com/limu57/Tau", "blue")
         self.log(f"当前地图: {MAP_DATA.get('name', CURRENT_MAP)}", "grey")
         self.root.after(5 * 60 * 1000, self._clean_old_logs)
 
@@ -629,6 +642,7 @@ class AutoFishingApp:
         ('cast_aim_lift_start', '抛竿补偿起始距离(格)', float),
         ('cast_aim_lift_height', '抛竿高差抵消系数(格/格)', float),
         ('px_color', '鱼漂像素颜色(#RRGGBB)', str),
+        ('grab_from_window', '只读游戏窗口像素(后台用)', bool),
         ('window_title_keyword', '游戏窗口标题关键词', str),
         ('px_width', '检测区域宽(像素)', int),
         ('px_height', '检测区域高(像素)', int),
@@ -809,6 +823,21 @@ class AutoFishingApp:
         except Exception:
             pass
 
+    def _refresh_catch_count(self):
+        """刷新主页面累计上钩数显示。"""
+        try:
+            self.catch_count_label.configure(text=f"累计上钩：{self.total_catches} 次")
+        except Exception:
+            pass
+
+    def _on_catch(self):
+        """一次成功上钩：累计数 +1 并持久化、刷新显示（线程安全）。"""
+        self.total_catches += 1
+        with self.config_lock:
+            self.config['total_catches'] = self.total_catches
+        self._schedule_ui(self._refresh_catch_count)
+        self._save_config_async()
+
     def _on_input_mode_changed(self, event=None):
         """输入模式切换：global=全局注入 / window=窗口消息注入（不影响其他窗口）。"""
         val = self.input_mode_combo.get()
@@ -839,7 +868,7 @@ class AutoFishingApp:
         tk.Label(title_box, text="Tau", bg=self.HEADER_BG, fg='#ffffff',
                  font=(self.FONT, 18, 'bold')).pack(side='left')
         self._make_badge(title_box, "自动钓鱼", self.ACCENT).pack(side='left', padx=(8, 0), pady=(3, 0))
-        tk.Label(top, text="v1.1", bg=self.HEADER_BG, fg=self.HEADER_MUTED,
+        tk.Label(top, text="v1.3.1", bg=self.HEADER_BG, fg=self.HEADER_MUTED,
                  font=(self.FONT, 9)).pack(side='right', pady=(5, 0))
 
         # 状态行
@@ -849,6 +878,10 @@ class AutoFishingApp:
         self.status_label = tk.Label(status_row, textvariable=self.status_var, bg=self.HEADER_BG,
                                      fg=self.MUTED, font=(self.FONT, 9, 'bold'))
         self.status_label.pack(side='left')
+        self.catch_count_label = tk.Label(status_row, text=f"累计上钩：{self.total_catches} 次",
+                                          bg=self.HEADER_BG, fg=self.HEADER_MUTED,
+                                          font=(self.FONT, 9, 'bold'))
+        self.catch_count_label.pack(side='left', padx=(14, 0))
 
         # —— 页面切换标签 ——
         self.page = 'main'
@@ -887,6 +920,7 @@ class AutoFishingApp:
         self.fish_depleted_chk = self._make_check(body, "鱼群枯竭后发出提示音", self.fish_depleted_alert_enabled)
         self.auto_relocate_chk = self._make_check(body, "枯竭自动换池", self.auto_relocate_enabled)
         self.multiple_cast_chk = self._make_check(body, "换池后额外抛竿", self.multiple_cast_enabled)
+        self.pass_bg_chk = self._make_check(body, "钓上通行证后程序背景变色", self.pass_bg_enabled_var)
 
         # —— 地图选择卡片 ——
         _, body = self._make_card(self.main_page, "地图选择")
@@ -986,6 +1020,92 @@ class AutoFishingApp:
             self.config_entries[key] = var
         body.grid_columnconfigure(1, weight=1)
 
+        # —— 日志监听卡片 ——
+        _, body = self._make_card(self.settings_inner, "日志监听")
+        # 行0：监听开关
+        tk.Label(body, text="日志监听:", bg=self.CARD_BG, fg=self.TEXT,
+                 font=(self.FONT, 9)).grid(row=0, column=0, padx=(10, 5), sticky='w')
+        self.log_watch_combo = ttk.Combobox(body, values=['on', 'off'],
+                                            state='readonly', width=5, font=(self.FONT, 9))
+        self.log_watch_combo.set('on' if self.config.get('log_watch_enabled', True) else 'off')
+        self.log_watch_combo.grid(row=0, column=1, sticky='w', pady=2)
+        self.log_watch_combo.bind('<<ComboboxSelected>>', self._on_log_watch_toggle)
+        # 行1：日志路径 + 浏览按钮（同一 Frame 内紧贴，避免 column weight 把按钮推到远处）
+        tk.Label(body, text="日志路径:", bg=self.CARD_BG, fg=self.TEXT,
+                 font=(self.FONT, 9)).grid(row=1, column=0, padx=(10, 5), sticky='w')
+        self.log_path_var = tk.StringVar(value=str(self.config.get('log_watch_path', '') or ''))
+        path_frame = tk.Frame(body, bg=self.CARD_BG)
+        path_frame.grid(row=1, column=1, sticky='w', pady=2)
+        path_entry = self._make_entry(path_frame, self.log_path_var, width=8, justify='left')   # 约 50px 宽
+        path_entry.pack(side='left')
+        path_entry.bind('<FocusOut>', self._on_log_path_changed)
+        path_entry.bind('<Return>', self._on_log_path_changed)
+        browse_btn = tk.Button(path_frame, text="浏览...", command=self._browse_log_path,
+                               font=(self.FONT, 8), relief='flat', bg='#e2e8f0', fg=self.TEXT,
+                               activebackground='#cbd5e1', cursor='hand2', padx=6)
+        browse_btn.pack(side='left', padx=(6, 0))   # 紧贴输入框右侧
+        # 行2：枯竭触发换池开关（类似输入模式切换）
+        tk.Label(body, text="枯竭触发换池:", bg=self.CARD_BG, fg=self.TEXT,
+                 font=(self.FONT, 9)).grid(row=2, column=0, padx=(10, 5), sticky='w')
+        self.log_relocate_combo = ttk.Combobox(body, values=['on', 'off'],
+                                               state='readonly', width=5, font=(self.FONT, 9))
+        self.log_relocate_combo.set('on' if self.config.get('log_relocate_enabled', True) else 'off')
+        self.log_relocate_combo.grid(row=2, column=1, sticky='w', pady=2)
+        self.log_relocate_combo.bind('<<ComboboxSelected>>', self._on_log_relocate_toggle)
+        # 行3：轮询间隔
+        tk.Label(body, text="轮询间隔(秒):", bg=self.CARD_BG, fg=self.TEXT,
+                 font=(self.FONT, 9)).grid(row=3, column=0, padx=(10, 5), sticky='w')
+        interval_var = tk.StringVar(value=str(self.config.get('log_watch_interval', 0.3)))
+        interval_entry = self._make_entry(body, interval_var, width=6)
+        interval_entry.grid(row=3, column=1, sticky='w', pady=2)
+        interval_entry.bind('<FocusOut>', lambda e, k='log_watch_interval', t=float, v=interval_var: self._on_config_changed(k, t, v))
+        interval_entry.bind('<Return>', lambda e, k='log_watch_interval', t=float, v=interval_var: self._on_config_changed(k, t, v))
+        # 行4：通行证背景颜色
+        tk.Label(body, text="通行证背景色:", bg=self.CARD_BG, fg=self.TEXT,
+                 font=(self.FONT, 9)).grid(row=4, column=0, padx=(10, 5), sticky='w')
+        color_var = tk.StringVar(value=str(self.config.get('pass_bg_color', '#8b5cf6')))
+        color_entry = self._make_entry(body, color_var, width=8)
+        color_entry.grid(row=4, column=1, sticky='w', pady=2)
+        color_entry.bind('<FocusOut>', lambda e, k='pass_bg_color', t=str, v=color_var: self._on_config_changed(k, t, v))
+        color_entry.bind('<Return>', lambda e, k='pass_bg_color', t=str, v=color_var: self._on_config_changed(k, t, v))
+        # 行5：规则说明
+        tk.Label(body, text="匹配规则在 fisher_config.json 的 log_watch_rules 修改（action: pass_card / relocate）",
+                 bg=self.CARD_BG, fg=self.MUTED, font=(self.FONT, 8)).grid(row=5, column=0,
+                 columnspan=3, padx=(10, 5), sticky='w', pady=(2, 2))
+        body.grid_columnconfigure(1, weight=1)
+
+    def _on_log_watch_toggle(self, event=None):
+        val = self.log_watch_combo.get() == 'on'
+        with self.config_lock:
+            self.config['log_watch_enabled'] = val
+        self._save_config_async()
+        self.log(f"日志监听: {'开' if val else '关'}", "blue")
+
+    def _on_log_relocate_toggle(self, event=None):
+        val = self.log_relocate_combo.get() == 'on'
+        with self.config_lock:
+            self.config['log_relocate_enabled'] = val
+        self._save_config_async()
+        self.log(f"日志触发换池: {'开' if val else '关'}", "blue")
+
+    def _on_log_path_changed(self, event=None):
+        val = self.log_path_var.get().strip()
+        with self.config_lock:
+            self.config['log_watch_path'] = val
+        self._save_config_async()
+
+    def _browse_log_path(self):
+        """打开文件选择对话框选择 latest.log，并写入配置。"""
+        path = filedialog.askopenfilename(
+            title="选择游戏日志文件 (latest.log)",
+            filetypes=[("日志文件", "*.log"), ("所有文件", "*.*")])
+        if path:
+            with self.config_lock:
+                self.config['log_watch_path'] = path
+            self.log_path_var.set(path)
+            self._save_config_async()
+            self.log(f"游戏日志路径已设置: {path}", "blue")
+
     def _draw_rounded_border(self, event=None):
         self.out_canvas.delete("all")
         w = self.out_canvas.winfo_width(); h = self.out_canvas.winfo_height()
@@ -1033,7 +1153,45 @@ class AutoFishingApp:
         return self.MUTED
     def log(self, message, color='black'):
         if not self._closing:
-            self.root.after(0, self._log_to_C, message, color)
+            try:
+                self._log_queue.put((message, color))
+            except Exception:
+                pass   # 队列不可用时丢弃日志，不影响动作流程
+
+    def _drain_log_queue(self):
+        """主线程轮询：把各线程入队的日志与 UI 回调刷新到界面（避免后台线程直调 Tk 造成的阻塞/死锁）。"""
+        if self._closing:
+            return
+        try:
+            for _ in range(50):
+                msg, color = self._log_queue.get_nowait()
+                self._log_to_C(msg, color)
+        except queue.Empty:
+            pass
+        except Exception:
+            pass
+        try:
+            for _ in range(20):
+                fn = self._ui_queue.get_nowait()
+                try:
+                    fn()
+                except Exception:
+                    pass
+        except queue.Empty:
+            pass
+        except Exception:
+            pass
+        try:
+            self.root.after(100, self._drain_log_queue)
+        except Exception:
+            pass
+
+    def _schedule_ui(self, fn):
+        """把 UI 刷新回调交给主线程执行（线程安全）。"""
+        try:
+            self._ui_queue.put(fn)
+        except Exception:
+            pass
 
     def _block_log_edit(self, event):
         """日志框只读：禁止编辑，放行复制(Ctrl+C)与全选(Ctrl+A)。"""
@@ -1162,6 +1320,162 @@ class AutoFishingApp:
         self.keyboard_listener.daemon = True
         self.keyboard_listener.start()
 
+    # ===== 游戏日志监听（latest.log 增量 tail，匹配文字触发动作） =====
+    def start_log_watcher(self):
+        """启动 latest.log 监听线程：增量读取新增行，按规则匹配触发动作。"""
+        self.log_watch_stop = threading.Event()
+        self.log_watch_thread = threading.Thread(target=self._log_watcher_loop, daemon=True)
+        self.log_watch_thread.start()
+
+    def _decode_log_text(self, raw):
+        """自动检测日志编码：优先 UTF-8，失败用 GB18030（中文 Windows 的 Minecraft 日志）。"""
+        try:
+            return raw.decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                return raw.decode('gb18030', errors='ignore')
+            except Exception:
+                return raw.decode('utf-8', errors='ignore')
+
+    def _log_watcher_loop(self):
+        """轮询日志文件：记录字节游标，只读新增内容；文件被重写时游标归零。
+        二进制读取 + 自动编码检测（中文 Windows 日志为 GB18030，UTF-8 读会乱码）。"""
+        if not self.config.get('log_watch_enabled', True):
+            return
+        path = str(self.config.get('log_watch_path', '') or '').strip()
+        if not path:
+            self.log("日志监听未启用：未设置日志路径（设置页点「浏览...」选择 latest.log）","orange")
+            return
+        rules = self.config.get('log_watch_rules', []) or []
+        self.log(f"日志监听已启动: {path}（规则 {len(rules)} 条）","grey")
+        # 启动时跳到文件末尾：只监听启动后新增的行，避免历史旧消息（如昨天的"枯竭"）误触发动作
+        try:
+            offset = os.path.getsize(path) if os.path.exists(path) else 0
+        except Exception:
+            offset = 0
+        interval = float(self.config.get('log_watch_interval', 0.3))
+        while not self._closing and not self.log_watch_stop.is_set():
+            try:
+                size = os.path.getsize(path)
+                if size < offset:   # 日志被重写/滚动
+                    offset = 0
+                if size > offset:
+                    with open(path, 'rb') as f:
+                        f.seek(offset)
+                        raw = f.read()
+                        offset = f.tell()
+                    self._check_log_lines(self._decode_log_text(raw))
+            except FileNotFoundError:
+                offset = 0
+            except Exception:
+                pass
+            if self.log_watch_stop.wait(interval):
+                break
+
+    def _normalize_log_text(self, s):
+        """归一化日志文本用于匹配：去 Minecraft 颜色代码(§x)、全角标点转半角、转小写。"""
+        try:
+            s = re.sub(r'\u00a7[0-9a-fk-or]', '', s, flags=re.IGNORECASE)
+        except Exception:
+            pass
+        out = []
+        for ch in s:
+            o = ord(ch)
+            if o == 0x3000:
+                out.append(' ')
+            elif 0xFF01 <= o <= 0xFF5E:
+                out.append(chr(o - 0xFEE0))   # 全角 → 半角
+            else:
+                out.append(ch)
+        return ''.join(out).lower()
+
+    def _check_log_lines(self, data):
+        """对新增日志逐行匹配规则（归一化后子串匹配，支持 '|' 多片段任一命中），
+        命中则执行对应动作并输出命中行。"""
+        if not data:
+            return
+        rules = self.config.get('log_watch_rules', []) or []
+        if not rules:
+            return
+        for line in data.splitlines():
+            line_norm = self._normalize_log_text(line)
+            for rule in rules:
+                text = ((rule or {}).get('text', '') or '').strip()
+                if not text:
+                    continue
+                matched = False
+                for frag in text.split('|'):
+                    frag_norm = self._normalize_log_text(frag.strip())
+                    if frag_norm and frag_norm in line_norm:
+                        matched = True
+                        break
+                if matched:
+                    self.log(f"日志命中: {line.strip()[:80]}","purple")
+                    self._execute_log_action((rule or {}).get('action', ''), line)
+                    break   # 一行只触发一条规则
+
+    def _execute_log_action(self, action, line):
+        """按动作类型分发：pass_card 主线程改背景；relocate 后台线程换池。"""
+        if action == 'pass_card':
+            self.root.after(0, self._log_action_pass_card)
+        elif action == 'relocate':
+            threading.Thread(target=self._log_action_relocate, daemon=True).start()
+        else:
+            self.log(f"未知日志动作: {action}", "orange")
+
+    def _log_action_pass_card(self):
+        """通行证日志：GUI 背景改为自定义颜色（默认紫），直到手动关闭自动钓鱼恢复。"""
+        try:
+            if not self.config.get('pass_bg_enabled', True):
+                return
+            color = str(self.config.get('pass_bg_color', '#8b5cf6') or '#8b5cf6')
+            self._set_ui_bg(color)
+            self.log(f"钓上通行证！程序背景变为 {color}（关闭自动钓鱼后恢复）","purple")
+        except Exception as e:
+            self.log(f"通行证背景动作失败: {e}", "orange")
+
+    def _log_action_relocate(self):
+        """钓点枯竭日志：触发自动换池（开关 log_relocate_enabled 控制）。"""
+        if not self.config.get('log_relocate_enabled', True):
+            return
+        with self.lock:
+            if self.relocating:
+                return   # 已在换池中，跳过重复触发
+            self.relocating = True
+        try:
+            self.log("日志检测：该钓点已枯竭，开始自动换池","orange")
+            self.stop_fishing()
+            self._relocate_and_restart()
+        except Exception as e:
+            self.log(f"日志换池错误: {e}", "red")
+        finally:
+            with self.lock:
+                self.relocating = False
+
+    def _set_ui_bg(self, color):
+        """把程序背景（页面主体）设为指定颜色。"""
+        try:
+            widgets = [self.root, self.main_page, self.settings_page, self.tab_canvas,
+                       self.settings_canvas, self.settings_inner, self.out_canvas]
+            for w in widgets:
+                try: w.configure(bg=color)
+                except Exception: pass
+            self._draw_tabs()
+        except Exception:
+            pass
+
+    def _restore_ui_bg(self):
+        """恢复默认背景色。"""
+        try:
+            self._set_ui_bg(self.BG)
+        except Exception:
+            pass
+
+    def _on_pass_bg_changed(self):
+        with self.config_lock:
+            self.config['pass_bg_enabled'] = self.pass_bg_enabled_var.get()
+        self._save_config_async()
+
     # ===== 输入后端（global=全局注入 / window=窗口消息注入，不影响用户操作） =====
     VK_MAP = {
         'w': 0x57, 'a': 0x41, 's': 0x53, 'd': 0x44,
@@ -1233,8 +1547,91 @@ class AutoFishingApp:
         time.sleep(self.config.get('click_post_delay',0.05))
         self.simulate_flag.clear()
 
+    def _capture_game_window(self):
+        """用 PrintWindow 抓取游戏窗口图像：后台/被遮挡时也取游戏自身内容，
+        前台其他窗口不会干扰像素判定。注意 PW_RENDERFULLCONTENT(2) 渲染整个窗口
+        （含边框），故位图用整窗尺寸、坐标映射用窗口原点。返回 PIL Image(RGB)；
+        失败返回 None。带 80ms 缓存避免高频抓图开销。"""
+        try:
+            now = time.time()
+            if getattr(self, '_win_cap', None) and now - self._win_cap[0] < 0.08:
+                return self._win_cap[1]
+            hwnd = self._find_game_window()
+            if not hwnd:
+                return None
+            l, t, r, b = win32gui.GetWindowRect(hwnd)   # 整窗（含边框），与 flag=2 对应
+            w, h = r - l, b - t
+            if w <= 0 or h <= 0:
+                return None
+            user32 = ctypes.windll.user32
+            gdi32 = ctypes.windll.gdi32
+            hwnd_dc = user32.GetDC(hwnd)
+            if not hwnd_dc:
+                return None
+            try:
+                mem_dc = gdi32.CreateCompatibleDC(hwnd_dc)
+                if not mem_dc:
+                    return None
+                try:
+                    bitmap = gdi32.CreateCompatibleBitmap(hwnd_dc, w, h)
+                    if not bitmap:
+                        return None
+                    try:
+                        old = gdi32.SelectObject(mem_dc, bitmap)
+                        # PW_RENDERFULLCONTENT=2：走 DWM 合成内容，OpenGL/DirectX 后台也能抓
+                        if user32.PrintWindow(hwnd, mem_dc, 2) == 0:
+                            return None
+                        bmi = _BITMAPINFOHEADER()
+                        bmi.biSize = ctypes.sizeof(_BITMAPINFOHEADER)
+                        bmi.biWidth = w
+                        bmi.biHeight = -h   # 自顶向下
+                        bmi.biPlanes = 1
+                        bmi.biBitCount = 32
+                        buf = ctypes.create_string_buffer(w * h * 4)
+                        if gdi32.GetDIBits(mem_dc, bitmap, 0, h, buf, ctypes.byref(bmi), 0) == 0:
+                            return None
+                        img = Image.frombuffer('RGB', (w, h), buf, 'raw', 'BGRX', 0, 1)
+                        if img.getbbox() is None:
+                            return None   # 全黑视为抓取失败，回退屏幕截图
+                        self._win_cap = (now, img)
+                        return img
+                    finally:
+                        gdi32.SelectObject(mem_dc, old)
+                        gdi32.DeleteObject(bitmap)
+                finally:
+                    gdi32.DeleteDC(mem_dc)
+            finally:
+                user32.ReleaseDC(hwnd, hwnd_dc)
+        except Exception:
+            return None
+
+    def _get_window_origin(self):
+        """返回游戏窗口左上角的屏幕坐标 (left, top)；失败返回 None。"""
+        try:
+            hwnd = self._find_game_window()
+            if hwnd:
+                l, t, r, b = win32gui.GetWindowRect(hwnd)
+                return (l, t)
+        except Exception:
+            pass
+        return None
+
     def _grab_pixel_rgb(self, x, y):
-        """局部截屏取单像素 RGB（比 pyautogui.pixel 的全屏截图快）。失败返回 None。"""
+        """优先从游戏窗口（PrintWindow）取像素：后台挂机时只读游戏自身内容，
+        前台其他窗口不会误触发上鱼。由 grab_from_window 配置控制（默认关，
+        回退屏幕截图保证检测可靠）；PrintWindow 失败也会自动回退屏幕截图。"""
+        if self.config.get('grab_from_window', False):
+            try:
+                img = self._capture_game_window()
+                if img is not None:
+                    origin = self._get_window_origin()
+                    if origin is not None:
+                        lx, ly = x - origin[0], y - origin[1]
+                        if 0 <= lx < img.width and 0 <= ly < img.height:
+                            return img.getpixel((lx, ly))
+            except Exception:
+                pass
+        # 屏幕截图（默认方式）
         try:
             if not hasattr(self, '_screen_size'):
                 self._screen_size = pyautogui.size()
@@ -1244,8 +1641,8 @@ class AutoFishingApp:
             right, bottom = min(sw - 1, x + rad + 1), min(sh - 1, y + rad + 1)
             if right <= left or bottom <= top:
                 return None
-            img = ImageGrab.grab(bbox=(left, top, right, bottom))
-            arr = np.array(img, dtype=np.int16)
+            img2 = ImageGrab.grab(bbox=(left, top, right, bottom))
+            arr = np.array(img2, dtype=np.int16)
             return tuple(int(v) for v in arr[y - top, x - left])
         except Exception as e:
             now = time.time()
@@ -1335,7 +1732,9 @@ class AutoFishingApp:
 
     def toggle_B(self):
         if self.B_status=='off': self.start_fishing()
-        else: self.stop_fishing()
+        else:
+            self.stop_fishing()
+            self._restore_ui_bg()   # 手动关闭自动钓鱼：恢复通行证背景
 
     def start_fishing(self):
         self.stop_fishing()
@@ -1385,6 +1784,7 @@ class AutoFishingApp:
         if auto_prepare:
             # 检测完成后统一在此线程完成：自动收竿 → 等待 → 自动抛竿 → 进入循环
             time.sleep(self.config.get('prepare_cast_delay',0.1)); self.simulate_right_click()
+            self._on_catch()   # 第一次检测的上钩计入累计总数
             self.log("已自动收竿，请等待5秒","#41b349")
             if stop_event.wait(self.config.get('initial_catch_cast_delay',5.0)): return
             self.simulate_right_click()
@@ -1444,6 +1844,7 @@ class AutoFishingApp:
                             confirmed = False; break
                     if confirmed:
                         self.log("检测到上钩，收竿！","green")
+                        self._on_catch()   # 累计上钩数 +1 并持久化
                         if stop_event.wait(self.config.get('confirm_check_interval',0.1)): break
                         self.simulate_right_click()
                         wait = random.uniform(rw_min, rw_max)
@@ -1699,6 +2100,8 @@ class AutoFishingApp:
         pitch_angle = self.config.get('float_pitch_angle',45.0)
         check_interval = self.config.get('float_check_interval',0.3)
         turn_tol = self.config.get('water_turn_tolerance', 5.0)
+        stuck_threshold = self.config.get('stuck_threshold',0.15)
+        stuck_trigger = self.config.get('stuck_trigger_count',2)
         coords = self._get_current_coords(2)
         if not coords: return False
         init_pitch = coords[4]; cyaw = coords[3]
@@ -1714,14 +2117,29 @@ class AutoFishingApp:
         self._key_down('w'); self._key_down('space')
         t0 = time.time()   # 超时从按下空格起算（前置取坐标/转向不计入）
         last_warn = 0.0
+        stuck_count = 0; last_coord = None
         try:
             while not self.navigation_stop_event.is_set():
                 coords = self._get_current_coords(2)
                 if not coords:
                     if self._wait_or_stop(check_interval): break
                     continue
-                cy = coords[1]; last_ys.append(cy)
-                water_th = self._get_sea_level_y(coords[0], coords[2])
+                cx, cy, cz = coords[0], coords[1], coords[2]
+                last_ys.append(cy)
+                water_th = self._get_sea_level_y(cx, cz)
+                # 卡死检测：上浮时 xz 连续不变说明被障碍物卡住（如水面与半砖之间），触发避障
+                if last_coord is not None:
+                    d = math.hypot(cx - last_coord[0], cz - last_coord[1])
+                    if d < stuck_threshold:
+                        stuck_count += 1
+                        self.log(f"上浮卡死计数: {stuck_count}/{stuck_trigger}","grey")
+                        if stuck_count >= stuck_trigger:
+                            self.log("上浮位置不变，触发避障","orange")
+                            self._execute_stuck_evasion()
+                            return False
+                    else:
+                        stuck_count = 0
+                last_coord = (cx, cz)
                 if cy >= water_th:
                     # 检测到上岸/浮出水面：立即停止移动（单次判定，不等二次确认，避免在岸上继续行进绕圈）
                     self.log("已浮出水面，停止上浮","green")
@@ -2232,6 +2650,50 @@ class AutoFishingApp:
             if math.hypot(tx-sx, ty-sy, tz-sz) < threshold: return True
         return False
 
+    # ===== 子中转（sub_via_stations：子中转点绑定一群钓点编号） =====
+    def _find_spot_sub_via(self, spot, sub_stations):
+        """返回钓点 spot 绑定的子中转站（按坐标匹配 fishing_spots 编号）；无则 None。"""
+        if not spot:
+            return None
+        for i, s in enumerate(self.fishing_spots):
+            if (s is spot or (abs(s['x']-spot['x'])<0.01 and abs(s['y']-spot['y'])<0.01
+                              and abs(s['z']-spot['z'])<0.01)):
+                num = i + 1
+                for st in sub_stations:
+                    if num in (st.get('spots') or []):
+                        return st
+                return None
+        return None
+
+    def _find_start_sub_via(self, cx, cz, sub_stations):
+        """出发点最近的钓点绑定的子中转站；无则 None。"""
+        best_sp, best_d = None, float('inf')
+        for sp in self.fishing_spots:
+            d = math.hypot(sp['x'] - cx, sp['z'] - cz)
+            if d < best_d:
+                best_d = d; best_sp = sp
+        if best_sp is None:
+            return None
+        return self._find_spot_sub_via(best_sp, sub_stations)
+
+    def _build_sub_via_path(self, cx, cz, target):
+        """子中转路径规划：
+        起点侧——出发点最近的钓点若绑定了子中转，先前往该子中转再继续；
+        终点侧——目标钓点若绑定了子中转，先前往子中转再到目标（起点子中转与终点
+        子中转相同时只去一次）。
+        返回 [(name, point), ...]（不含最终目标）；无子中转配置时返回 []。"""
+        sub_stations = (self.current_map_data or {}).get('sub_via_stations') or []
+        if not sub_stations:
+            return []
+        start_sub = self._find_start_sub_via(cx, cz, sub_stations)
+        end_sub = self._find_spot_sub_via(target, sub_stations)
+        path = []
+        if start_sub and (end_sub is None or start_sub.get('id') != end_sub.get('id')):
+            path.append(('子中转', start_sub))
+        if end_sub:
+            path.append(('子中转', end_sub))
+        return path
+
     def _is_via_point(self, target):
         threshold = self.config.get('via_spot_threshold', 0.5)
         for st in self.via_stations:
@@ -2313,6 +2775,19 @@ class AutoFishingApp:
         if not coords:
             self.log("无法获取当前坐标，直接导航","red"); return self._navigate_to_target(target)
         cx,cy,cz,_,_ = coords
+        # —— 子中转路径（map 配置 sub_via_stations）：起点最近钓点子中转 → 目标子中转 → 目标 ——
+        sub_points = self._build_sub_via_path(cx, cz, target)
+        if sub_points:
+            path_points = sub_points + [('目标', target)]
+            path_str = " → ".join(f"{name}({pt['x']:.1f},{pt['y']:.1f},{pt['z']:.1f})" for name, pt in path_points)
+            self.log(f"【子中转】路径规划: {path_str}","blue")
+            for name, pt in path_points[:-1]:
+                if self.navigation_stop_event.is_set(): return False
+                if not self._navigate_to_target(pt, via_mode=True):
+                    self.log(f"前往{name}失败","red"); return False
+                self.log(f"已到达{name}","green")
+            return self._navigate_to_target(target, via_mode=False)
+        # —— 原有中转逻辑（chain/fixed/conditional/decision） ——
         path_ids = self._build_via_path(cx, cz, target)
         if not path_ids:
             return self._navigate_to_target(target)
@@ -2481,6 +2956,9 @@ class AutoFishingApp:
         if self.keyboard_listener:
             try: self.keyboard_listener.stop()
             except Exception: pass  # 关闭时忽略监听器停止异常
+        if getattr(self, 'log_watch_stop', None):
+            try: self.log_watch_stop.set()
+            except Exception: pass
         self.stop_fishing()
         self.detect_stop_event.set()
         self.navigation_stop_event.set()
