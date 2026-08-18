@@ -1,5 +1,5 @@
 """
-Tau 1.3.1 — Minecraft 自动钓鱼脚本 
+Tau 1.3.2 — Minecraft 自动钓鱼脚本 
 by limu57 with deepseek
 """
 import tkinter as tk
@@ -16,7 +16,7 @@ from collections import deque
 
 # ================= 默认配置 =================
 DEFAULT_CONFIG = {
-    'max_lines':8,'polling_rate':250,'px_color':'#fcfcfc','px_height':200,'px_width':325,'crosshair_x_ratio':0.5,'crosshair_y_ratio':0.5,'detect_center_offset_x_ratio':0.0,'detect_center_offset_y_ratio':-0.1111,'color_tolerance':20,'detection_tolerance':5,'detection_timeout':30.0,'no_fish_timeout':40.0,'base_no_fish_timeout':40.0,'total_catches':0,'confirmation_time':0.5,'reel_wait_min':4.0,'reel_wait_max':6.0,'cast_delay_min':0.1,'cast_delay_max':0.4,'dpi':1321,'sensitivity':95,'arrival_dist':1.5,'angle_tolerance':1.0,'obstacle_time':3,'polling_jitter':50,'mouse_jitter':2,'auto_throw_enabled':True,'fish_depleted_alert_enabled':True,'auto_relocate_enabled':True,'multiple_cast':True,'water_jump_threshold':124.0,'fn_lock_enabled':False,'per_check':1.0,'player_speed':5.625,'i_loop_max_iter':10,'i_loop_adaptive_max_walk':2.0,'i_loop_adaptive_ratio':0.6,'verbose_navigation':False,'log_level':'INFO','deg_per_pixel_override':None,'grab_from_window':False,'window_title_keyword':'布吉岛','log_watch_enabled':True,'log_watch_path':'','log_watch_interval':0.3,'log_relocate_enabled':True,'log_watch_rules':[{'text':'[CHAT] 您取得了 通行证-沉船遗迹 !','action':'pass_card'},{'text':'[CHAT] 不行! 这个钓点已经枯竭','action':'relocate'}],'pass_bg_enabled':True,'pass_bg_color':'#8b5cf6','min_distance_to_cast':5.0,'detection_poll_interval':0.2,'max_coord_retries':5,'t_loop_restart_interval':10.0,'t_loop_loose_dist':30.0,'t_loop_angle_tolerance':5.0,'walk_time_factor':0.9,'water_float_timeout':2.0,'max_water_fails':3,'pitch_down_after_arrival':0.0,'stuck_threshold':0.15,'manual_cast_timeout':31.0,'auto_cast_wait':2.0,'initial_catch_cast_delay':5.0,'copy_coord_delay':0.5,'coord_retry_delay_1':0.3,'coord_retry_delay_2':0.2,'mouse_move_step':20,'mouse_move_delay':0.005,'mouse_move_multiplier':1.0,'eye_height':1.62,'deg_per_pixel_factor':0.15,'max_rotation_attempts':5,'rotation_retry_delay':0.05,'t_to_i_distance':15.0,'water_turn_tolerance':5.0,'stuck_trigger_count':2,'i_loop_min_walk_time':0.05,'i_loop_max_walk_time':1.0,'i_loop_post_walk_delay':0.2,'align_water_max_iter':6,'align_water_delay':0.3,'cast_aim_lift':0.15,'cast_aim_lift_start':6.0,'cast_aim_lift_height':0.1,'shore_climb_time':0.3,'float_pitch_angle':45.0,'float_check_interval':0.3,'evasion_back_time':1.0,'evasion_short_max':3.0,'evasion_long_min':3.0,'evasion_long_max':5.0,'evasion_short_probability':0.8,'evasion_cycle_interval':3,'forbidden_max_depth':5,'forbidden_max_steps':50,'forbidden_step_duration':0.2,'forbidden_step_pause':0.1,'forbidden_approach_dist':5.0,'forbidden_exit_extra_time':0.3,'relocate_coord_retries':6,'exclude_spot_distance':5.0,'relocate_finish_delay':0.5,'multi_cast_delay_1':0.5,'multi_cast_delay_2':0.3,'via_spot_threshold':0.5,'click_pre_delay':0.02,'click_post_delay':0.05,'ray_align_min_step':2.0,'ui_window_width':360,'ui_window_height':900,'ui_minsize_width':360,'ui_minsize_height':700,'current_map':'map1','input_mode':'window','key_stop_navigation':'b+m','key_toggle_fishing':'b+n','grab_sample_radius':2,'grab_fail_wait':0.5,'confirm_check_interval':0.1,'prepare_cast_delay':0.1,'auto_cast_post_wait':2.0,'poll_min_interval':0.05,'post_click_interval':0.03,'combo_key_interval':0.02,'coord_abs_limit':100000,'tasklist_timeout':5,'window_activate_delay':0.05,'align_success_angle':0.5,'forbidden_poll_wait':0.3,'coord_fail_wait':0.5,'coord_fail_wait_i':0.3,'log_retention_seconds':600,'log_clean_interval_ms':300000,'hourly_check_interval':60,'pixel_err_log_interval':5.0,'manual_cast_poll_wait':1.0,'chain_near_threshold':2.0
+    'max_lines':8,'polling_rate':250,'px_color':'#fcfcfc','px_height':200,'px_width':325,'crosshair_x_ratio':0.5,'crosshair_y_ratio':0.5,'detect_center_offset_x_ratio':0.0,'detect_center_offset_y_ratio':-0.1111,'color_tolerance':20,'detection_tolerance':5,'detection_timeout':30.0,'no_fish_timeout':40.0,'base_no_fish_timeout':40.0,'total_catches':0,'confirmation_time':0.5,'reel_wait_min':4.0,'reel_wait_max':6.0,'cast_delay_min':0.1,'cast_delay_max':0.4,'dpi':1321,'sensitivity':95,'arrival_dist':1.5,'angle_tolerance':1.0,'obstacle_time':3,'polling_jitter':50,'mouse_jitter':2,'auto_throw_enabled':True,'fish_depleted_alert_enabled':True,'auto_relocate_enabled':True,'multiple_cast':True,'water_jump_threshold':124.0,'fn_lock_enabled':False,'per_check':1.0,'player_speed':5.625,'i_loop_max_iter':10,'i_loop_adaptive_max_walk':2.0,'i_loop_adaptive_ratio':0.6,'verbose_navigation':False,'log_level':'INFO','deg_per_pixel_override':None,'grab_from_window':False,'detect_start_delay':5.0,'relocate_timeout_enabled':True,'relocate_timeout':300.0,'window_title_keyword':'布吉岛','log_watch_enabled':True,'log_watch_path':'','log_watch_interval':0.3,'log_relocate_enabled':True,'log_watch_rules':[{'text':'[CHAT] 您取得了 通行证-沉船遗迹 !','action':'pass_card'},{'text':'[CHAT] 不行! 这个钓点已经枯竭','action':'relocate'}],'pass_bg_enabled':True,'pass_bg_color':'#8b5cf6','min_distance_to_cast':5.0,'detection_poll_interval':0.2,'max_coord_retries':5,'t_loop_restart_interval':10.0,'t_loop_loose_dist':30.0,'t_loop_angle_tolerance':5.0,'walk_time_factor':0.9,'water_float_timeout':2.0,'max_water_fails':3,'pitch_down_after_arrival':0.0,'stuck_threshold':0.15,'manual_cast_timeout':31.0,'auto_cast_wait':2.0,'initial_catch_cast_delay':5.0,'copy_coord_delay':0.5,'coord_retry_delay_1':0.3,'coord_retry_delay_2':0.2,'mouse_move_step':20,'mouse_move_delay':0.005,'mouse_move_multiplier':1.0,'eye_height':1.62,'deg_per_pixel_factor':0.15,'max_rotation_attempts':5,'rotation_retry_delay':0.05,'t_to_i_distance':15.0,'water_turn_tolerance':5.0,'stuck_trigger_count':2,'i_loop_min_walk_time':0.05,'i_loop_max_walk_time':1.0,'i_loop_post_walk_delay':0.2,'align_water_max_iter':6,'align_water_delay':0.3,'cast_aim_lift':0.15,'cast_aim_lift_start':6.0,'cast_aim_lift_height':0.1,'shore_climb_time':0.3,'float_pitch_angle':45.0,'float_check_interval':0.3,'evasion_back_time':1.0,'evasion_short_max':3.0,'evasion_long_min':3.0,'evasion_long_max':5.0,'evasion_short_probability':0.8,'evasion_cycle_interval':3,'forbidden_max_depth':5,'forbidden_max_steps':50,'forbidden_step_duration':0.2,'forbidden_step_pause':0.1,'forbidden_approach_dist':5.0,'forbidden_exit_extra_time':0.3,'relocate_coord_retries':6,'exclude_spot_distance':5.0,'relocate_finish_delay':0.5,'multi_cast_delay_1':0.5,'multi_cast_delay_2':0.3,'via_spot_threshold':0.5,'click_pre_delay':0.02,'click_post_delay':0.05,'ray_align_min_step':2.0,'ui_window_width':360,'ui_window_height':900,'ui_minsize_width':360,'ui_minsize_height':700,'current_map':'map1','input_mode':'window','key_stop_navigation':'b+m','key_toggle_fishing':'b+n','grab_sample_radius':2,'grab_fail_wait':0.5,'confirm_check_interval':0.1,'prepare_cast_delay':0.1,'auto_cast_post_wait':2.0,'poll_min_interval':0.05,'post_click_interval':0.03,'combo_key_interval':0.02,'coord_abs_limit':100000,'tasklist_timeout':5,'window_activate_delay':0.05,'align_success_angle':0.5,'forbidden_poll_wait':0.3,'coord_fail_wait':0.5,'coord_fail_wait_i':0.3,'log_retention_seconds':600,'log_clean_interval_ms':300000,'hourly_check_interval':60,'pixel_err_log_interval':5.0,'manual_cast_poll_wait':1.0,'chain_near_threshold':2.0
 }
 
 # ================= 默认地图数据 =================
@@ -469,7 +469,7 @@ class AutoFishingApp:
         self.hourly_reset_thread.start()
 
         self.root = tk.Tk()
-        self.root.title("Tau 1.3.1")
+        self.root.title("Tau 1.3.2")
         w = config.get('ui_window_width', 300); h = config.get('ui_window_height', 900)
         mw = config.get('ui_minsize_width', 300); mh = config.get('ui_minsize_height', 700)
         self.root.geometry(f"{w}x{h}"); self.root.minsize(mw, mh)
@@ -480,6 +480,7 @@ class AutoFishingApp:
         self.auto_relocate_enabled = tk.BooleanVar(value=config.get('auto_relocate_enabled', False))
         self.multiple_cast_enabled = tk.BooleanVar(value=config.get('multiple_cast', False))
         self.pass_bg_enabled_var = tk.BooleanVar(value=config.get('pass_bg_enabled', True))
+        self.relocate_timeout_enabled_var = tk.BooleanVar(value=config.get('relocate_timeout_enabled', True))
         self.depleted_alerted = False
         self.relocating = False   # 日志触发换池进行中标志（防止重复触发）
 
@@ -539,10 +540,11 @@ class AutoFishingApp:
         self.auto_relocate_enabled.trace_add('write', lambda *a: self._on_checkbox_changed())
         self.multiple_cast_enabled.trace_add('write', lambda *a: self._on_checkbox_changed())
         self.pass_bg_enabled_var.trace_add('write', lambda *a: self._on_pass_bg_changed())
+        self.relocate_timeout_enabled_var.trace_add('write', lambda *a: self._on_relocate_timeout_toggle())
         self.fn_lock_on_var.trace_add('write', lambda *a: self._on_fn_lock_changed())
         self.fn_lock_off_var.trace_add('write', lambda *a: self._on_fn_lock_changed())
         self._update_status("就绪")
-        self.log("欢迎使用Tau 1.3.1，作者:limu57，禁止倒卖，项目地址:https://github.com/limu57/Tau", "blue")
+        self.log("欢迎使用Tau 1.3.2，作者:limu57，禁止倒卖，项目地址:https://github.com/limu57/Tau", "blue")
         self.log(f"当前地图: {MAP_DATA.get('name', CURRENT_MAP)}", "grey")
         self.root.after(5 * 60 * 1000, self._clean_old_logs)
 
@@ -647,6 +649,9 @@ class AutoFishingApp:
         ('px_width', '检测区域宽(像素)', int),
         ('px_height', '检测区域高(像素)', int),
         ('detection_tolerance', '检测颜色容差', int),
+        ('detect_start_delay', '检测延迟(秒)', float),
+        ('relocate_timeout', '寻路超时(秒)', float),
+        ('total_catches', '累计上钩数', int),
         ('key_stop_navigation', '停止寻路快捷键', str),
         ('key_toggle_fishing', '钓鱼开关快捷键', str),
     ]
@@ -812,6 +817,11 @@ class AutoFishingApp:
                 self._base_no_fish_timeout = float(val)   # 更新配置设置原值（四图恢复时用）
                 self.config['base_no_fish_timeout'] = float(val)   # 持久化原值，四图 70s 覆盖后重启仍可恢复
                 self._refresh_throw_text()   # 主页面"XX秒无鱼自动抛竿"文案同步刷新
+            elif key == 'relocate_timeout':
+                self._refresh_relocate_timeout_text()   # 设置页勾选框文案同步时长
+            elif key == 'total_catches':
+                self.total_catches = int(float(val))   # 累计上钩数同步
+                self._refresh_catch_count()
         self._save_config_async()
         self.log(f"配置 {key} → {val}", "grey")
 
@@ -868,7 +878,7 @@ class AutoFishingApp:
         tk.Label(title_box, text="Tau", bg=self.HEADER_BG, fg='#ffffff',
                  font=(self.FONT, 18, 'bold')).pack(side='left')
         self._make_badge(title_box, "自动钓鱼", self.ACCENT).pack(side='left', padx=(8, 0), pady=(3, 0))
-        tk.Label(top, text="v1.3.1", bg=self.HEADER_BG, fg=self.HEADER_MUTED,
+        tk.Label(top, text="v1.3.2", bg=self.HEADER_BG, fg=self.HEADER_MUTED,
                  font=(self.FONT, 9)).pack(side='right', pady=(5, 0))
 
         # 状态行
@@ -1005,6 +1015,21 @@ class AutoFishingApp:
                                                command=self._on_fn_lock_on_changed)
         self.fn_lock_off_chk = self._make_check(body, "FnLock off", self.fn_lock_off_var,
                                                 command=self._on_fn_lock_off_changed)
+
+        # —— 寻路超时卡片 ——
+        _, body = self._make_card(self.settings_inner, "寻路超时")
+        minutes = int(float(self.config.get('relocate_timeout', 300)) / 60)
+        self.relocate_timeout_chk = tk.Checkbutton(body,
+                                                   text=f"{minutes}分钟内未到钓点则放弃",
+                                                   variable=self.relocate_timeout_enabled_var,
+                                                   bg=self.CARD_BG, fg=self.TEXT,
+                                                   activebackground=self.CARD_BG,
+                                                   activeforeground=self.TEXT, selectcolor='white',
+                                                   relief='flat', bd=0, highlightthickness=0,
+                                                   font=(self.FONT, 9), anchor='w')
+        self.relocate_timeout_chk.pack(pady=2, padx=8, anchor='w')
+        tk.Label(body, text="时长在「配置设置」里修改（秒，默认300）",
+                 bg=self.CARD_BG, fg=self.MUTED, font=(self.FONT, 8)).pack(pady=(0, 8), padx=8, anchor='w')
 
         # —— 配置设置卡片 ——
         _, body = self._make_card(self.settings_inner, "配置设置")
@@ -1476,6 +1501,19 @@ class AutoFishingApp:
             self.config['pass_bg_enabled'] = self.pass_bg_enabled_var.get()
         self._save_config_async()
 
+    def _on_relocate_timeout_toggle(self):
+        with self.config_lock:
+            self.config['relocate_timeout_enabled'] = self.relocate_timeout_enabled_var.get()
+        self._save_config_async()
+
+    def _refresh_relocate_timeout_text(self):
+        """设置页「寻路超时」勾选框文案同步时长（分钟）。"""
+        try:
+            minutes = int(float(self.config.get('relocate_timeout', 300)) / 60)
+            self.relocate_timeout_chk.configure(text=f"{minutes}分钟内未到钓点则放弃")
+        except Exception:
+            pass
+
     # ===== 输入后端（global=全局注入 / window=窗口消息注入，不影响用户操作） =====
     VK_MAP = {
         'w': 0x57, 'a': 0x41, 's': 0x53, 'd': 0x44,
@@ -1660,6 +1698,12 @@ class AutoFishingApp:
         self.detect_thread.start(); self._update_status("检测中...")
 
     def _detection_thread(self):
+        # 检测延迟：点击「检测文字位置」后等待 n 秒再开始（默认5秒，留时间回游戏抛竿）
+        delay = float(self.config.get('detect_start_delay', 5.0) or 0)
+        if delay > 0:
+            self.log(f"将在 {delay:.0f} 秒后开始检测，请回到游戏抛竿","orange")
+            if self.detect_stop_event.wait(delay):
+                return
         self.log("正在检测中，请抛竿","#2e317c")
         screen_w, screen_h = pyautogui.size()
         hwnd = self._find_game_window()
@@ -2120,6 +2164,8 @@ class AutoFishingApp:
         stuck_count = 0; last_coord = None
         try:
             while not self.navigation_stop_event.is_set():
+                if self._nav_timed_out():
+                    self.log("寻路超时，放弃该目标","red"); return False
                 coords = self._get_current_coords(2)
                 if not coords:
                     if self._wait_or_stop(check_interval): break
@@ -2468,6 +2514,8 @@ class AutoFishingApp:
         if getattr(self, '_last_stuck_coord', None) is None: self._last_stuck_coord = None
         try:
             while not self.navigation_stop_event.is_set():
+                if self._nav_timed_out():
+                    self.log("寻路超时，放弃该目标","red"); return 'timeout'
                 coords = self._get_current_coords(2)
                 if not coords:
                     if self._wait_or_stop(self.config.get('coord_fail_wait',0.5)): break
@@ -2533,6 +2581,8 @@ class AutoFishingApp:
         if getattr(self, '_stuck_count', None) is None: self._stuck_count = 0
         if getattr(self, '_last_stuck_coord', None) is None: self._last_stuck_coord = None
         while not self.navigation_stop_event.is_set() and iter_count < max_iter:
+            if self._nav_timed_out():
+                self.log("寻路超时，放弃该目标","red"); return 'timeout'
             coords = self._get_current_coords(2)
             if not coords:
                 if self._wait_or_stop(self.config.get('coord_fail_wait_i',0.3)): break
@@ -2637,6 +2687,7 @@ class AutoFishingApp:
                 self._update_status("导航中（I循环）")
                 i_result = self._i_loop(target, via_mode)
                 if i_result == 'retry': continue
+                if i_result == 'timeout': return False
                 if i_result: return True
                 else: return False
             elif t_result == 'retry': continue
@@ -2766,10 +2817,19 @@ class AutoFishingApp:
             return list(rule.get('fallback_path', []))
         return list(rule.get('fallback_path', []))
 
+    def _nav_timed_out(self):
+        """寻路超时判断（relocate_timeout_enabled 开启时，超过设定时长放弃该目标）。"""
+        d = getattr(self, '_nav_deadline', None)
+        return d is not None and time.time() > d
+
     def _navigate_to_spot_v2(self, target):
         if self.navigation_stop_event.is_set(): return False
         self._ensure_window_active(); self.navigation_stop_event.clear()
         self.bypassed_zones.clear()
+        # 寻路超时：从开始导航本目标起计时，超时则放弃（T/I/上浮循环内检查 _nav_timed_out）
+        self._nav_deadline = None
+        if self.config.get('relocate_timeout_enabled', True):
+            self._nav_deadline = time.time() + float(self.config.get('relocate_timeout', 300))
         self.log(f"目标钓点: ({target['x']:.2f}, {target['y']:.2f}, {target['z']:.2f})","grey")
         coords = self._get_current_coords(2)
         if not coords:

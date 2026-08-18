@@ -1,4 +1,4 @@
-# Tau v1.3.1
+# Tau v1.3.2
 
 Minecraft Java 版自动钓鱼脚本，带自动换池，Windows 用。
 
